@@ -97,7 +97,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Waist strip, front",
         sub: "Under the main front panel. Small, but it never leaves the frame.",
         size: "9 × 4 cm",
-        price: 100,
+        price: 200,
       },
       {
         no: "13",
@@ -105,7 +105,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Waist strip, back",
         sub: "Under the main back panel. The strip every following rider reads.",
         size: "9 × 4 cm",
-        price: 100,
+        price: 200,
       },
       {
         no: "14",
@@ -113,7 +113,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Front thigh, left",
         sub: "In shot for 56 miles of bike and 13.1 of run.",
         size: "5 × 4 cm",
-        price: 150,
+        price: 250,
       },
       {
         no: "15",
@@ -121,7 +121,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Front thigh, right",
         sub: "Same panel, other leg, sold on its own.",
         size: "5 × 4 cm",
-        price: 150,
+        price: 250,
       },
       {
         no: "16",
@@ -129,7 +129,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Back thigh, left",
         sub: "Facing the camera on every climb.",
         size: "5 × 4 cm",
-        price: 150,
+        price: 250,
       },
       {
         no: "17",
@@ -137,7 +137,7 @@ export const GROUPS: PositionGroup[] = [
         name: "Back thigh, right",
         sub: "Same panel, other leg, sold on its own.",
         size: "5 × 4 cm",
-        price: 150,
+        price: 250,
       },
     ],
   },
