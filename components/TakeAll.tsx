@@ -4,12 +4,10 @@ import { money } from "@/lib/money";
 
 export default function TakeAll({
   taken,
-  links,
 }: {
   taken: boolean;
-  links: Record<string, string>;
 }) {
-  const href = buyHref(TAKE_ALL.no, `All ${TOTAL_N} positions`, links);
+  const href = buyHref(TAKE_ALL.no);
 
   return (
     <section className="tight">

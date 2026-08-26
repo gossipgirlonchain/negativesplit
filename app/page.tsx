@@ -14,7 +14,6 @@ import ThanksBanner from "@/components/ThanksBanner";
 import { POSITIONS, TAKE_ALL, openCount, raised } from "@/lib/positions";
 import { getSold } from "@/lib/sold";
 import { getApprovedSponsors } from "@/lib/sponsors";
-import { getPaymentLinks } from "@/lib/stripe-links";
 
 /* Sold state lives in KV and is written by the Stripe webhook, so the
    page has to go and look. Thirty seconds is close enough to instant
@@ -22,10 +21,9 @@ import { getPaymentLinks } from "@/lib/stripe-links";
 export const revalidate = 30;
 
 export default async function Page() {
-  const [sold, sponsors, links] = await Promise.all([
+  const [sold, sponsors] = await Promise.all([
     getSold(),
     getApprovedSponsors(),
-    getPaymentLinks(),
   ]);
   const soldList = [...sold];
 
@@ -40,15 +38,15 @@ export default async function Page() {
           <div className="wrap hero">
             <ThanksBanner />
             <Hero />
-            <Sheet sold={soldList} sponsors={sponsors} links={links} />
+            <Sheet sold={soldList} sponsors={sponsors} />
           </div>
 
           <div className="wrap" id="positions">
             <Progress raised={raised(sold)} open={openCount(sold)} />
-            <PositionList sold={soldList} sponsors={sponsors} links={links} />
+            <PositionList sold={soldList} sponsors={sponsors} />
           </div>
 
-          <TakeAll taken={takenAll} links={links} />
+          <TakeAll taken={takenAll} />
           <Rules />
           <HowItWorks />
           <RaceSpec />

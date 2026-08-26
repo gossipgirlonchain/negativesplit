@@ -9,17 +9,44 @@ import { BY_NO, TAKE_ALL, TOTAL_N } from "@/lib/positions";
 
 export default function ThanksBanner() {
   const [claimed, setClaimed] = useState<string | null>(null);
+  const [taken, setTaken] = useState<string | null>(null);
 
   useEffect(() => {
-    const value = new URLSearchParams(window.location.search).get("claimed");
-    if (!value) return;
-    setClaimed(value);
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get("claimed");
+    const gone = params.get("taken");
+    if (!value && !gone) return;
+    if (gone) setTaken(gone);
+    if (value) setClaimed(value);
     window.history.replaceState(
       null,
       "",
       window.location.pathname + window.location.hash,
     );
   }, []);
+
+  // someone clicked Claim on a position that sold while they were reading
+  if (taken) {
+    const gone = BY_NO[taken];
+    return (
+      <div className="thanks show">
+        {gone ? (
+          <>
+            <b>
+              No. {gone.no}, {gone.name}
+            </b>{" "}
+            went while you were looking. Nothing was charged. The rest of the
+            board is below.
+          </>
+        ) : (
+          <>
+            That position has gone. Nothing was charged. The rest of the board is
+            below.
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (!claimed) return null;
 

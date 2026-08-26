@@ -170,42 +170,13 @@ export const BY_TARGET: Record<string, Position> = Object.fromEntries(
   POSITIONS.map((p) => [p.target, p]),
 );
 
-/* ============================================================
-   STRIPE PAYMENT LINKS
-
-   Run `node scripts/stripe-setup.mjs` and paste what it prints
-   over this block. Any position left blank falls back to a
-   prefilled email, so a missing link costs you a lead, not a sale.
-   ============================================================ */
-export const STRIPE_LINKS: Record<string, string> = {
-  "01": "",
-  "02": "",
-  "03": "",
-  "04": "",
-  "05": "",
-  "06": "",
-  "07": "",
-  "08": "",
-  "09": "",
-  "10": "",
-  "11": "",
-  TITLE: "",
-};
-
-export function buyHref(
-  no: string,
-  label: string,
-  live?: Record<string, string>,
-): string {
-  // live links from Stripe win, then anything pasted in below, then email
-  const link = live?.[no] || STRIPE_LINKS[no];
-  if (link) return link;
-  const subject = `${SITE_NAME} - claiming No. ${no} (${label})`;
-  const body = `Hi Winny,\n\nI want No. ${no} - ${label}.\n\nBrand:\nArtwork format:\n\n`;
-  return (
-    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`
-  );
+/**
+ * Where a Claim button goes. The route builds a Stripe Checkout Session
+ * for this position on the spot and redirects to it, so there is nothing
+ * to create in Stripe ahead of time and no list of URLs to maintain.
+ */
+export function buyHref(no: string): string {
+  return `/api/checkout/${encodeURIComponent(no)}`;
 }
 
 /** Committed dollars, given what KV says has sold. */

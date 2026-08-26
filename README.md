@@ -65,28 +65,18 @@ Open http://localhost:3000. With no KV configured, every position reads as
 available and the visitor counter stays hidden — both correct: nothing has
 sold, and there is nothing real to count.
 
-## 2. Create the Stripe products, against test keys
+## 2. Nothing to create in Stripe
 
-```bash
-export STRIPE_SECRET_KEY=sk_test_...
-export SITE_URL=http://localhost:3000
-node scripts/stripe-setup.mjs
-```
+There is no setup step. Clicking Claim hits `/api/checkout/<position>`,
+which builds a Stripe Checkout Session on the spot from the price in
+`lib/positions.ts` and redirects the buyer to it. No products, no prices,
+no payment links, no list of URLs to paste or keep in sync.
 
-**You no longer paste anything.** The site reads live payment links straight
-from Stripe, matched on the `metadata.position` the script writes. Create them
-and the Claim buttons switch from email to real checkout on the next
-revalidate.
+Paying is what reserves a position. If someone opens a checkout for a
+position that has already sold, the route sends them back to the board with
+`?taken=<no>` and an explanation rather than charging them.
 
-Two ways to create them, both idempotent:
-
-- **From the site**: sign in at `/admin` and press **Create payment links**.
-  No terminal, no local key. This is the easy one.
-- **From the terminal**: the script above.
-
-`STRIPE_LINKS` in `lib/positions.ts` still exists as a manual override for a
-one-off link, but it can stay empty. A position with no link anywhere falls
-back to a prefilled email, so a missing link costs a lead, not a sale.
+`scripts/stripe-setup.mjs` is kept for reference but is no longer needed.
 
 ## 3. Wire the webhook locally
 
