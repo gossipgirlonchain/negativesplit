@@ -7,7 +7,7 @@
    which owns the SVG it measures. */
 
 import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
-import { BY_TARGET, buyHref } from "@/lib/positions";
+import { BY_TARGET, TOTAL_N, buyHref } from "@/lib/positions";
 import type { PublicSponsor } from "@/lib/sponsors";
 import { money } from "@/lib/money";
 import { hoverHandlers, useHover } from "./HoverSync";
@@ -153,7 +153,7 @@ export default function Drawing({
       className="hero-svg"
       viewBox="0 0 1250 436"
       role="img"
-      aria-label="Technical drawing of a triathlon suit front and back, an aero helmet from the side and front, and a time trial frameset, with eleven numbered sponsor positions marked in pink"
+      aria-label={`Technical drawing of a triathlon suit front and back, an aero helmet from the side and front, and a time trial frameset, with ${TOTAL_N} numbered sponsor positions marked in pink`}
     >
       {/* ---------- suit, front ---------- */}
       <g transform="translate(-11.8,-17.8) scale(0.95)">

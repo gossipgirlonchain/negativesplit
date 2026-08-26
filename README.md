@@ -29,19 +29,12 @@ lib/
   positions.ts              THE single source of truth for the board
   sold.ts                   KV reads and writes for sold state
   money.ts                  formatting
-scripts/
-  stripe-setup.mjs          creates every Stripe product, price and payment link
 ```
 
 **`lib/positions.ts` is the source of truth.** Prices, names, sizes, group
 headers, the inventory total, the "individually $3,300" figure and every count
 on the page derive from the `GROUPS` array. Change a price there and the whole
 page follows.
-
-One number is deliberately typed twice: `scripts/stripe-setup.mjs` carries its
-own copy of the price list, because it runs under plain `node` with no
-TypeScript loader. **If you change a price in `lib/positions.ts`, change it in
-the script too and re-run it.**
 
 **Sponsor artwork is never self-publishing.** An upload lands as `pending`
 and only appears on the board after it is approved at `/admin`. See
@@ -76,7 +69,9 @@ Paying is what reserves a position. If someone opens a checkout for a
 position that has already sold, the route sends them back to the board with
 `?taken=<no>` and an explanation rather than charging them.
 
-`scripts/stripe-setup.mjs` is kept for reference but is no longer needed.
+`scripts/stripe-setup.mjs` has been deleted. It created payment links the
+site no longer uses, and it carried its own hand-written copy of the price
+list, which had already gone stale. It is in git history if you want it.
 
 ## 3. Wire the webhook locally
 
