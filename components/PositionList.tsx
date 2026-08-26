@@ -103,8 +103,10 @@ function Row({
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={sponsor.logoUrl} alt="" />
+            {sponsor.logoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={sponsor.logoUrl} alt="" />
+            ) : null}
             <span>{sponsor.brand}</span>
           </a>
         ) : null}

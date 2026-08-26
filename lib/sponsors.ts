@@ -21,7 +21,9 @@ export type PublicSponsor = {
   no: string;
   brand: string;
   url: string;
-  logoUrl: string;
+  /** Absent until artwork is approved. A brand can go on the board by
+   *  name first, and gain its logo later. */
+  logoUrl?: string;
 };
 
 /** The full record, admin side. */
@@ -54,12 +56,13 @@ export async function getApprovedSponsors(): Promise<Record<string, PublicSponso
     const parsed = typeof value === "string" ? safeParse(value) : value;
     if (!parsed || typeof parsed !== "object") continue;
     const s = parsed as Partial<PublicSponsor>;
-    if (!s.logoUrl || !s.brand) continue;
+    if (!s.brand) continue;
+    const logoUrl = str(s.logoUrl);
     out[str(no)] = {
       no: str(no),
       brand: str(s.brand),
       url: str(s.url),
-      logoUrl: str(s.logoUrl),
+      ...(logoUrl ? { logoUrl } : {}),
     };
   }
   return out;
@@ -176,4 +179,31 @@ export async function getOwnerEmail(no: string): Promise<string> {
 /** Bind a position to a different email than the one that paid. */
 export async function setOwnerEmail(no: string, email: string): Promise<void> {
   await kv().set(overrideKey(no), email.trim().toLowerCase());
+}
+
+/* ---------- publishing a name without artwork ----------
+   The brand a buyer types at Stripe checkout is free text from a
+   stranger. It reaches the board only when you put it there. */
+
+/** Put a brand name on the board, with or without a logo. */
+export async function publishBrand(
+  no: string,
+  brand: string,
+  url = "",
+): Promise<void> {
+  const existing = await getSponsorRecord(no);
+  const entry: PublicSponsor = {
+    no,
+    brand: brand.trim(),
+    url: url.trim(),
+    ...(existing?.status === "approved" && existing.logoUrl
+      ? { logoUrl: existing.logoUrl }
+      : {}),
+  };
+  await kv().hset(PUBLIC_KEY, { [no]: JSON.stringify(entry) });
+}
+
+/** Take a name back off the board. */
+export async function hideBrand(no: string): Promise<void> {
+  await kv().hdel(PUBLIC_KEY, no);
 }

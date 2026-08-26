@@ -51,7 +51,7 @@ export default function Drawing({
     let width: number;
     let height: number;
 
-    if (sponsor) {
+    if (sponsor?.logoUrl) {
       // a sponsored position shows the mark big enough to actually read,
       // with the brand under it. Clicking goes to their site.
       const brand = sponsor.brand.toUpperCase();
@@ -76,8 +76,10 @@ export default function Drawing({
       txt.setAttribute("font-size", "11");
       txt.setAttribute("letter-spacing", "1.3");
     } else {
-      const label =
-        p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
+      // a sponsor with no artwork yet still reads as their name
+      const label = sponsor
+        ? `${p.name}  ·  ${sponsor.brand}`
+        : p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
       width = label.length * 6.6 + 26;
       height = 30;
 
@@ -124,7 +126,7 @@ export default function Drawing({
       className: [
         "zone",
         isSold ? "sold" : "",
-        sponsor ? "sponsored" : "",
+        sponsor?.logoUrl ? "sponsored" : "",
         active === target ? "on" : "",
       ]
         .filter(Boolean)
@@ -301,14 +303,14 @@ export default function Drawing({
             {spec.plates.map((plate, i) => (
               <rect key={`p${i}`} className="plate" {...plate} />
             ))}
-            {sponsor
+            {sponsor?.logoUrl
               ? spec.plates.map((plate, i) => {
                   const pad = Math.min(4, plate.height * 0.14);
                   return (
                     <image
                       key={`l${i}`}
                       className="logo"
-                      href={sponsor.logoUrl}
+                      href={sponsor.logoUrl as string}
                       x={plate.x + pad}
                       y={plate.y + pad}
                       width={plate.width - pad * 2}

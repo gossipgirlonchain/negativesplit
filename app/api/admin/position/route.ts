@@ -1,7 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { viewerFrom } from "@/lib/auth";
 import { BY_NO, TAKE_ALL } from "@/lib/positions";
-import { releasePosition, setSoldManually } from "@/lib/sold";
+import { getSale, releasePosition, setSoldManually } from "@/lib/sold";
+import { hideBrand, publishBrand } from "@/lib/sponsors";
 
 /* Take a position off the board or put it back, without Stripe.
    For bank transfers, trades, and testing the artwork flow. Admin only. */
@@ -19,11 +20,33 @@ export async function POST(req: Request) {
     position?: string;
     action?: string;
     email?: string;
+    brand?: string;
+    url?: string;
   };
 
   const no = String(body.position ?? "").trim();
   if (!BY_NO[no] && no !== TAKE_ALL.no) {
     return Response.json({ error: "unknown position" }, { status: 400 });
+  }
+
+  if (body.action === "publish-name") {
+    const sale = await getSale(no);
+    const brand = String(body.brand ?? sale?.brand ?? "").trim();
+    if (!brand) {
+      return Response.json(
+        { error: "no brand name on that sale. Enter one." },
+        { status: 400 },
+      );
+    }
+    await publishBrand(no, brand, String(body.url ?? "").trim());
+    revalidatePath("/");
+    return Response.json({ ok: true, position: no, brand });
+  }
+
+  if (body.action === "hide-name") {
+    await hideBrand(no);
+    revalidatePath("/");
+    return Response.json({ ok: true, position: no, state: "hidden" });
   }
 
   if (body.action === "release") {

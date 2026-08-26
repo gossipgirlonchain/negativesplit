@@ -19,6 +19,7 @@ type BoardEntry = {
   name: string;
   sold: boolean;
   sale: Sale | null;
+  onBoard: string;
 };
 
 type Record_ = {
@@ -82,6 +83,46 @@ export default function AdminReview() {
     } else {
       setError(data.error ?? "Could not start the test checkout.");
     }
+  }
+
+  async function nameOnBoard(entry: BoardEntry) {
+    setBusy(entry.no);
+    const token = await getAccessToken();
+    if (entry.onBoard) {
+      await fetch("/api/admin/position", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ position: entry.no, action: "hide-name" }),
+      });
+    } else {
+      const brand = window.prompt(
+        `Name to show on the board for No. ${entry.no}. This goes public.`,
+        entry.sale?.brand ?? "",
+      );
+      if (!brand?.trim()) {
+        setBusy("");
+        return;
+      }
+      const url = window.prompt("Link for that name? Leave blank for none.", "") ?? "";
+      await fetch("/api/admin/position", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          position: entry.no,
+          action: "publish-name",
+          brand,
+          url,
+        }),
+      });
+    }
+    setBusy("");
+    await load();
   }
 
   async function setBoardState(no: string, action: "sell" | "release") {
@@ -200,6 +241,15 @@ export default function AdminReview() {
                 <span className={`status ${entry.sold ? "rejected" : "approved"}`}>
                   {entry.sold ? "sold" : "available"}
                 </span>
+                {entry.sold ? (
+                  <button
+                    className="btn sm quiet"
+                    disabled={busy === entry.no}
+                    onClick={() => void nameOnBoard(entry)}
+                  >
+                    {entry.onBoard ? "Hide name" : "Show name"}
+                  </button>
+                ) : null}
                 <button
                   className="btn sm quiet"
                   disabled={busy === entry.no}
