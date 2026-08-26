@@ -25,8 +25,12 @@ export const ZONE_ORDER = [
   "k-front-lo",
   "k-back-lo",
   "k-sleeves",
-  "k-waist-front",
-  "k-waist-back",
+  "k-waist-f1",
+  "k-waist-f2",
+  "k-waist-f3",
+  "k-waist-b1",
+  "k-waist-b2",
+  "k-waist-b3",
   "k-leg-fl",
   "k-leg-fr",
   "k-leg-bl",
@@ -85,35 +89,56 @@ export const ZONES: Record<string, ZoneSpec> = {
       { x: 197.2, y: 82.9 },
     ],
   },
-  // waist strips sit below the lower panels, clear of the 14 CM dimension
-  "k-waist-front": {
+  // Three tabs across the waistband, front and back. The band runs from
+  // y=264 (clear of the 14 CM dimension) to y=331.8 (where the legs split).
+  "k-waist-f1": {
     code: "12",
-    plates: [{ x: 87.2, y: 270, width: 68, height: 30, rx: 7 }],
-    codes: [{ x: 121.2, y: 285 }],
+    plates: [{ x: 65.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 82.2, y: 288 }],
   },
-  "k-waist-back": {
+  "k-waist-f2": {
     code: "13",
-    plates: [{ x: 287.2, y: 270, width: 68, height: 30, rx: 7 }],
-    codes: [{ x: 321.2, y: 285 }],
+    plates: [{ x: 104.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 121.2, y: 288 }],
+  },
+  "k-waist-f3": {
+    code: "14",
+    plates: [{ x: 143.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 160.2, y: 288 }],
+  },
+  "k-waist-b1": {
+    code: "15",
+    plates: [{ x: 265.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 282.2, y: 288 }],
+  },
+  "k-waist-b2": {
+    code: "16",
+    plates: [{ x: 304.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 321.2, y: 288 }],
+  },
+  "k-waist-b3": {
+    code: "17",
+    plates: [{ x: 343.2, y: 272, width: 34, height: 32, rx: 6 }],
+    codes: [{ x: 360.2, y: 288 }],
   },
   // the legs only separate below y=331.8, so the thigh plates sit under that
   "k-leg-fl": {
-    code: "14",
+    code: "18",
     plates: [{ x: 69, y: 337, width: 38, height: 30, rx: 6 }],
     codes: [{ x: 88, y: 352 }],
   },
   "k-leg-fr": {
-    code: "15",
+    code: "19",
     plates: [{ x: 135, y: 337, width: 38, height: 30, rx: 6 }],
     codes: [{ x: 154, y: 352 }],
   },
   "k-leg-bl": {
-    code: "16",
+    code: "20",
     plates: [{ x: 269, y: 337, width: 38, height: 30, rx: 6 }],
     codes: [{ x: 288, y: 352 }],
   },
   "k-leg-br": {
-    code: "17",
+    code: "21",
     plates: [{ x: 335, y: 337, width: 38, height: 30, rx: 6 }],
     codes: [{ x: 354, y: 352 }],
   },
