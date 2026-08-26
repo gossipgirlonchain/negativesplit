@@ -454,3 +454,10 @@ footer { border-top:1px solid var(--line2); padding:46px 0 70px; }
 
 /* the callout never eats its own hover */
 .callout { pointer-events:none; transition:opacity .18s ease; }
+
+.board-row {
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:11px 0; border-top:1px solid var(--line2);
+}
+.board-row .nm { font-size:15px; margin-right:auto; }
+.board-row .btn { flex:0 0 auto; }

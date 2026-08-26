@@ -63,3 +63,33 @@ export async function markSold(
 
   await kv().sadd(SOLD_KEY, no, ...alsoClosed);
 }
+
+/* ---------- manual overrides ----------
+   For a position taken outside Stripe: a bank transfer, a trade, or a
+   dry run of the artwork flow. Does exactly what the webhook does, minus
+   the payment. */
+
+/** Mark a position sold by hand and record who owns it. */
+export async function setSoldManually(no: string, email: string): Promise<void> {
+  await kv().hset(`sale:${no}`, {
+    brand: "",
+    contact: "",
+    email: email.trim().toLowerCase(),
+    name: "",
+    amount: 0,
+    currency: "usd",
+    session: "manual",
+    at: new Date().toISOString(),
+  });
+
+  const alsoClosed = no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
+  await kv().sadd(SOLD_KEY, no, ...alsoClosed);
+}
+
+/** Put a position back on the board and forget its artwork. */
+export async function releasePosition(no: string): Promise<void> {
+  const alsoOpened = no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
+  await kv().srem(SOLD_KEY, no, ...alsoOpened);
+  await kv().del(`sale:${no}`, `sponsor:${no}`, `owner:${no}`);
+  await kv().hdel("sponsors:public", no);
+}
