@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function AdminPage() {
-  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+  const appId = process.env.PRIVY_APP_ID;
 
   return (
     <>
@@ -29,7 +29,7 @@ export default function AdminPage() {
             ) : (
               <div className="card panel">
                 <h3>Sign in is not configured</h3>
-                <p className="msg ok">Set NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET.</p>
+                <p className="msg ok">Set PRIVY_APP_ID and PRIVY_APP_SECRET.</p>
               </div>
             )}
           </div>

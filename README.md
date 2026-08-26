@@ -194,7 +194,7 @@ pending.
 1. Create a new Privy app at dashboard.privy.io. It has to be its own app;
    credentials from another project will not work. Enable **Email** as a login
    method and add `https://negativesplit.space` to Allowed origins.
-2. Put the app ID in `NEXT_PUBLIC_PRIVY_APP_ID` and the secret in
+2. Put the app ID in `PRIVY_APP_ID` and the secret in
    `PRIVY_APP_SECRET`.
 3. Add Vercel Blob: dashboard → Storage → Create → Blob, connect it to the
    project. That writes `BLOB_READ_WRITE_TOKEN`.
@@ -234,6 +234,6 @@ See `.env.local.example`. All five are required in production:
 `KV_REST_API_TOKEN`, `NEXT_PUBLIC_SITE_URL`.
 
 Four more are needed for sponsor sign in and artwork:
-`NEXT_PUBLIC_PRIVY_APP_ID`, `PRIVY_APP_SECRET`, `ADMIN_EMAILS`,
+`PRIVY_APP_ID`, `PRIVY_APP_SECRET`, `ADMIN_EMAILS`,
 `BLOB_READ_WRITE_TOKEN`. Without them the site still sells positions; the
 `/sponsor` page just tells buyers to email their artwork in.

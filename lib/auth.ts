@@ -8,7 +8,9 @@ import { PrivyClient } from "@privy-io/server-auth";
    taken from the request body.
    ============================================================ */
 
-const APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+// No NEXT_PUBLIC_ prefix needed: the app ID is read in a server component
+// and passed down as a prop. Privy app IDs are public identifiers anyway.
+const APP_ID = process.env.PRIVY_APP_ID;
 const APP_SECRET = process.env.PRIVY_APP_SECRET;
 
 export function privyConfigured(): boolean {

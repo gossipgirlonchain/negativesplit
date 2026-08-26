@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function SponsorPage() {
-  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+  const appId = process.env.PRIVY_APP_ID;
 
   return (
     <>
@@ -35,7 +35,7 @@ export default function SponsorPage() {
               <div className="card panel">
                 <h3>Sign in is not configured yet</h3>
                 <p className="msg ok">
-                  NEXT_PUBLIC_PRIVY_APP_ID is not set on this deployment. Email
+                  PRIVY_APP_ID is not set on this deployment. Email
                   your artwork to {CONTACT_EMAIL} and it gets handled by hand.
                 </p>
               </div>
