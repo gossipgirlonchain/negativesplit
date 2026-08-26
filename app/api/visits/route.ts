@@ -1,5 +1,4 @@
-import { kv } from "@vercel/kv";
-import { kvConfigured } from "@/lib/sold";
+import { kv, kvConfigured } from "@/lib/kv";
 
 /* ============================================================
    THE REAL VISITOR COUNTER
@@ -38,16 +37,16 @@ export async function POST(req: Request) {
     const cutoff = now - WINDOW_SECONDS * 1000;
 
     // sliding window of who is here right now
-    await kv.zadd("visits:live", { score: now, member: visitor });
-    await kv.zremrangebyscore("visits:live", 0, cutoff);
-    const live = await kv.zcard("visits:live");
+    await kv().zadd("visits:live", { score: now, member: visitor });
+    await kv().zremrangebyscore("visits:live", 0, cutoff);
+    const live = await kv().zcard("visits:live");
 
     // all-time, counted once per visitor per 12 hours
     const seenKey = `visits:seen:${visitor}`;
-    const fresh = await kv.set(seenKey, 1, { nx: true, ex: 60 * 60 * 12 });
+    const fresh = await kv().set(seenKey, 1, { nx: true, ex: 60 * 60 * 12 });
     const total = fresh
-      ? await kv.incr("visits:total")
-      : ((await kv.get<number>("visits:total")) ?? 0);
+      ? await kv().incr("visits:total")
+      : ((await kv().get<number>("visits:total")) ?? 0);
 
     return Response.json(
       { now: Math.max(1, live ?? 1), total: Number(total) },

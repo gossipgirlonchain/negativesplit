@@ -1,6 +1,5 @@
-import { kv } from "@vercel/kv";
+import { kv, kvConfigured } from "./kv";
 import { POSITIONS, TAKE_ALL } from "./positions";
-import { kvConfigured } from "./sold";
 
 /* ============================================================
    SPONSOR ARTWORK
@@ -47,7 +46,7 @@ const str = (v: unknown): string => (v === null || v === undefined ? "" : String
 /** Approved artwork only, keyed by position number. One KV read. */
 export async function getApprovedSponsors(): Promise<Record<string, PublicSponsor>> {
   if (!kvConfigured()) return {};
-  const raw = await kv.hgetall<Record<string, unknown>>(PUBLIC_KEY);
+  const raw = await kv().hgetall<Record<string, unknown>>(PUBLIC_KEY);
   if (!raw) return {};
 
   const out: Record<string, PublicSponsor> = {};
@@ -78,7 +77,7 @@ function safeParse(value: string): unknown {
 
 export async function getSponsorRecord(no: string): Promise<SponsorRecord | null> {
   if (!kvConfigured()) return null;
-  const raw = await kv.hgetall<Record<string, unknown>>(recordKey(no));
+  const raw = await kv().hgetall<Record<string, unknown>>(recordKey(no));
   if (!raw || !raw.logoUrl) return null;
   const status = str(raw.status);
   return {
@@ -118,7 +117,7 @@ export async function submitArtwork(input: {
   logoUrl: string;
   logoPath: string;
 }): Promise<void> {
-  await kv.hset(recordKey(input.no), {
+  await kv().hset(recordKey(input.no), {
     brand: input.brand,
     url: input.url,
     logoUrl: input.logoUrl,
@@ -129,7 +128,7 @@ export async function submitArtwork(input: {
     note: "",
   });
   // a resubmission pulls the old artwork off the public page immediately
-  await kv.hdel(PUBLIC_KEY, input.no);
+  await kv().hdel(PUBLIC_KEY, input.no);
 }
 
 export async function reviewArtwork(
@@ -141,7 +140,7 @@ export async function reviewArtwork(
   if (!record) return null;
 
   const status: SponsorStatus = decision === "approve" ? "approved" : "rejected";
-  await kv.hset(recordKey(no), {
+  await kv().hset(recordKey(no), {
     status,
     reviewedAt: new Date().toISOString(),
     note,
@@ -154,9 +153,9 @@ export async function reviewArtwork(
       url: record.url,
       logoUrl: record.logoUrl,
     };
-    await kv.hset(PUBLIC_KEY, { [no]: JSON.stringify(publicRecord) });
+    await kv().hset(PUBLIC_KEY, { [no]: JSON.stringify(publicRecord) });
   } else {
-    await kv.hdel(PUBLIC_KEY, no);
+    await kv().hdel(PUBLIC_KEY, no);
   }
 
   return { ...record, status, note };
@@ -168,13 +167,13 @@ export async function reviewArtwork(
  *  email that paid for it. */
 export async function getOwnerEmail(no: string): Promise<string> {
   if (!kvConfigured()) return "";
-  const override = await kv.get<string>(overrideKey(no));
+  const override = await kv().get<string>(overrideKey(no));
   if (override) return str(override).toLowerCase();
-  const sale = await kv.hgetall<Record<string, unknown>>(`sale:${no}`);
+  const sale = await kv().hgetall<Record<string, unknown>>(`sale:${no}`);
   return str(sale?.email).toLowerCase();
 }
 
 /** Bind a position to a different email than the one that paid. */
 export async function setOwnerEmail(no: string, email: string): Promise<void> {
-  await kv.set(overrideKey(no), email.trim().toLowerCase());
+  await kv().set(overrideKey(no), email.trim().toLowerCase());
 }
