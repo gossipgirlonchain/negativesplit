@@ -8,10 +8,18 @@
 
 import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
 import { BY_TARGET, buyHref } from "@/lib/positions";
+import type { PublicSponsor } from "@/lib/sponsors";
 import { money } from "@/lib/money";
 import { hoverHandlers, useHover } from "./HoverSync";
+import { ZONES, ZONE_ORDER } from "./zones";
 
-export default function Drawing({ sold }: { sold: string[] }) {
+export default function Drawing({
+  sold,
+  sponsors,
+}: {
+  sold: string[];
+  sponsors: Record<string, PublicSponsor>;
+}) {
   const soldSet = useMemo(() => new Set(sold), [sold]);
   const { active, setActive } = useHover();
 
@@ -37,7 +45,10 @@ export default function Drawing({ sold }: { sold: string[] }) {
       return;
     }
 
-    const label = p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
+    const sponsor = sponsors[p.no];
+    const label = sponsor
+      ? `${p.name}  ·  ${sponsor.brand}`
+      : p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
     txt.textContent = label;
     const w = label.length * 6.6 + 26;
     bg.setAttribute("width", String(w));
@@ -53,22 +64,34 @@ export default function Drawing({ sold }: { sold: string[] }) {
 
     callout.setAttribute("transform", `translate(${x},${y})`);
     callout.style.opacity = "1";
-  }, [active, soldSet]);
+  }, [active, soldSet, sponsors]);
 
   function zone(target: string) {
     const p = BY_TARGET[target];
     const isSold = soldSet.has(p.no);
+    const sponsor = sponsors[p.no];
     const go = () => {
+      if (sponsor?.url) {
+        window.open(sponsor.url, "_blank", "noopener,noreferrer");
+        return;
+      }
       if (!isSold) window.location.href = buyHref(p.no, p.name);
     };
     return {
       id: target,
-      className: ["zone", isSold ? "sold" : "", active === target ? "on" : ""]
+      className: [
+        "zone",
+        isSold ? "sold" : "",
+        sponsor ? "sponsored" : "",
+        active === target ? "on" : "",
+      ]
         .filter(Boolean)
         .join(" "),
       tabIndex: 0,
       role: "button" as const,
-      "aria-label": p.name,
+      "aria-label": sponsor
+        ? `${p.name}, sponsored by ${sponsor.brand}`
+        : p.name,
       ...hoverHandlers(target, setActive),
       onClick: go,
       onKeyDown: (e: KeyboardEvent<SVGGElement>) => {
@@ -228,124 +251,39 @@ export default function Drawing({ sold }: { sold: string[] }) {
       </text>
 
       {/* ---------- positions ---------- */}
-      <g {...zone("k-front-up")}>
-        <rect className="plate" x="69.9" y="84.8" width="102.6" height="72.2" rx="9" />
-        <text className="code" x="121.2" y="120.9">
-          01
-        </text>
-      </g>
-      <g {...zone("k-back-up")}>
-        <rect className="plate" x="268" y="81" width="106.4" height="79.8" rx="9" />
-        <text className="code" x="321.2" y="120.9">
-          02
-        </text>
-      </g>
-      <g {...zone("k-front-lo")}>
-        <rect className="plate" x="68" y="166.5" width="106.4" height="79.8" rx="9" />
-        <text className="code" x="121.2" y="206.4">
-          03
-        </text>
-      </g>
-      <g {...zone("k-back-lo")}>
-        <rect className="plate" x="268" y="166.5" width="106.4" height="79.8" rx="9" />
-        <text className="code" x="321.2" y="206.4">
-          04
-        </text>
-      </g>
-      <g {...zone("k-sleeves")}>
-        <rect
-          className="plate"
-          x="-21.9"
-          y="-16.2"
-          width="43.7"
-          height="32.3"
-          rx="7"
-          transform="translate(43.3,82.9) rotate(-60)"
-        />
-        <rect
-          className="plate"
-          x="-21.9"
-          y="-16.2"
-          width="43.7"
-          height="32.3"
-          rx="7"
-          transform="translate(197.2,82.9) rotate(60)"
-        />
-        <text className="code" x="43.3" y="82.9">
-          05
-        </text>
-        <text className="code" x="197.2" y="82.9">
-          05
-        </text>
-      </g>
-      <g {...zone("b-helmet")}>
-        <rect className="plate" x="482" y="133.6" width="54.4" height="23.8" rx="7" />
-        <text className="code" x="509.2" y="145.5">
-          09
-        </text>
-      </g>
-      <g {...zone("b-helmet-f")}>
-        <rect className="plate" x="461.6" y="263.6" width="49.3" height="22.1" rx="7" />
-        <text className="code" x="486.2" y="274.6">
-          10
-        </text>
-      </g>
-      <g {...zone("b-dt-low")}>
-        <rect
-          className="plate"
-          x="-42.5"
-          y="-16.2"
-          width="85"
-          height="32.3"
-          rx="8"
-          transform="translate(941.1,228.6) rotate(-27.8)"
-        />
-        <text className="code" x="941.1" y="228.6">
-          06
-        </text>
-      </g>
-      <g {...zone("b-dt-up")}>
-        <rect
-          className="plate"
-          x="-42.5"
-          y="-16.2"
-          width="85"
-          height="32.3"
-          rx="8"
-          transform="translate(1028.5,182.5) rotate(-27.8)"
-        />
-        <text className="code" x="1028.5" y="182.5">
-          07
-        </text>
-      </g>
-      <g {...zone("b-fork")}>
-        <rect
-          className="plate"
-          x="-38.3"
-          y="-9.4"
-          width="76.5"
-          height="18.7"
-          rx="6"
-          transform="translate(1101.3,203.1) rotate(86.4)"
-        />
-        <text className="code" x="1101.3" y="203.1">
-          08
-        </text>
-      </g>
-      <g {...zone("b-headtube")}>
-        <rect
-          className="plate"
-          x="-18.7"
-          y="-11.1"
-          width="37.4"
-          height="22.1"
-          rx="6"
-          transform="translate(1086.9,121.5) rotate(72)"
-        />
-        <text className="code" x="1086.9" y="121.5">
-          11
-        </text>
-      </g>
+      {ZONE_ORDER.map((target) => {
+        const spec = ZONES[target];
+        const sponsor = sponsors[BY_TARGET[target].no];
+        return (
+          <g key={target} {...zone(target)}>
+            {spec.plates.map((plate, i) => (
+              <rect key={`p${i}`} className="plate" {...plate} />
+            ))}
+            {sponsor
+              ? spec.plates.map((plate, i) => {
+                  const pad = Math.min(4, plate.height * 0.14);
+                  return (
+                    <image
+                      key={`l${i}`}
+                      className="logo"
+                      href={sponsor.logoUrl}
+                      x={plate.x + pad}
+                      y={plate.y + pad}
+                      width={plate.width - pad * 2}
+                      height={plate.height - pad * 2}
+                      transform={plate.transform}
+                      preserveAspectRatio="xMidYMid meet"
+                    />
+                  );
+                })
+              : spec.codes.map((c, i) => (
+                  <text key={`c${i}`} className="code" x={c.x} y={c.y}>
+                    {spec.code}
+                  </text>
+                ))}
+          </g>
+        );
+      })}
 
       <g className="callout" ref={calloutRef} style={{ opacity: 0 }}>
         <rect ref={bgRef} className="cbg" x="0" y="0" width="200" height="30" rx="15" fill="var(--text)" />

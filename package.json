@@ -11,6 +11,9 @@
     "stripe:setup": "node scripts/stripe-setup.mjs"
   },
   "dependencies": {
+    "@privy-io/react-auth": "^3.38.0",
+    "@privy-io/server-auth": "^1.32.5",
+    "@vercel/blob": "^2.8.0",
     "@vercel/kv": "^3.0.0",
     "next": "^15.5.0",
     "react": "^19.1.0",

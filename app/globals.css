@@ -380,3 +380,74 @@ footer { border-top:1px solid var(--line2); padding:46px 0 70px; }
   * { transition:none !important; animation:none !important; }
   .reveal { opacity:1; transform:none; }
 }
+
+/* ---------- sponsors ----------
+   A sold position with approved artwork shows the brand instead of a
+   number: the logo takes the plate in the drawing, and the row carries
+   the mark, the name and a link out. */
+.zone.sponsored .plate { fill:var(--bg3); stroke:var(--text3); stroke-dasharray:none; }
+.zone.sponsored.on .plate { fill:var(--bg3); stroke:var(--accent); }
+.zone .logo { pointer-events:none; }
+
+.row .sponsor {
+  display:inline-flex; align-items:center; gap:9px;
+  margin-top:9px; text-decoration:none; max-width:100%;
+}
+.row .sponsor img {
+  height:20px; width:auto; max-width:96px;
+  object-fit:contain; display:block; flex:0 0 auto;
+}
+.row .sponsor span {
+  font-family:var(--mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.11em; text-transform:uppercase; color:var(--text2);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.row .sponsor:hover span { color:var(--accent); }
+
+/* ---------- sponsor + admin panels ----------
+   Same primitives as the board: mono labels, one card per thing,
+   pink only on the action. */
+.panel { padding:24px 26px; margin-top:18px; }
+.panel h3 { font-size:18px; }
+.panel .head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.panel .head .label:last-child { margin-left:auto; }
+.panel .head .status { margin-left:auto; }
+
+.form { display:grid; gap:15px; margin-top:20px; }
+.field { display:grid; gap:6px; }
+.field label {
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--text3);
+}
+.field input[type="text"] {
+  font-family:var(--sans); font-size:15px; color:var(--text);
+  padding:11px 13px; background:var(--bg3);
+  border:1px solid var(--line); border-radius:var(--r-btn);
+}
+.field input[type="text"]:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.field input[type="file"] { font-family:var(--mono); font-size:12px; color:var(--text2); }
+
+.status {
+  display:inline-block; font-family:var(--mono); font-size:9.5px; font-weight:600;
+  letter-spacing:.11em; text-transform:uppercase;
+  padding:3px 7px; border-radius:2px; border:1px solid var(--line);
+  color:var(--text3);
+}
+.status.pending { color:var(--blue); border-color:var(--line); }
+.status.approved { color:#2FA84F; border-color:rgba(47,168,79,.4); }
+.status.rejected { color:var(--accent); border-color:var(--accent-line); }
+
+.preview {
+  display:flex; align-items:center; gap:14px; margin-top:16px;
+  padding:14px; background:var(--bg2);
+  border:1px solid var(--line2); border-radius:var(--r-btn);
+}
+.preview img { height:36px; width:auto; max-width:150px; object-fit:contain; }
+.preview .nm { font-size:16px; font-weight:500; }
+
+.note { font-size:13.5px; color:var(--text2); margin:6px 0 0; }
+.msg { font-size:15px; line-height:1.5; color:var(--text2); margin:14px 0 0; }
+.msg.err { color:var(--accent); }
+
+.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+.btn:disabled { opacity:.45; pointer-events:none; }

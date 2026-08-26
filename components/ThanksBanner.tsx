@@ -5,7 +5,7 @@
    statically rendered, and clears it from the URL afterwards. */
 
 import { useEffect, useState } from "react";
-import { BY_NO, CONTACT_EMAIL, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { BY_NO, TAKE_ALL, TOTAL_N } from "@/lib/positions";
 
 export default function ThanksBanner() {
   const [claimed, setClaimed] = useState<string | null>(null);
@@ -24,9 +24,9 @@ export default function ThanksBanner() {
   if (!claimed) return null;
 
   const position = BY_NO[claimed];
-  const mail = (
-    <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "var(--accent)" }}>
-      {CONTACT_EMAIL}
+  const send = (
+    <a href="/sponsor" style={{ color: "var(--accent)" }}>
+      send your artwork
     </a>
   );
 
@@ -38,17 +38,18 @@ export default function ThanksBanner() {
           <b>
             No. {position.no}, {position.name}
           </b>{" "}
-          is yours. Send artwork to {mail} as an SVG or a 300dpi PNG and I will
-          send a proof back.
+          is yours. Sign in with this email to {send}, an SVG or a 300dpi PNG,
+          and I will send a proof back.
         </>
       ) : claimed === TAKE_ALL.no ? (
         <>
-          Thank you. <b>All {TOTAL_N} positions</b> are yours. Send artwork to{" "}
-          {mail} as an SVG or a 300dpi PNG and I will send a proof back.
+          Thank you. <b>All {TOTAL_N} positions</b> are yours. Sign in with this
+          email to {send}, an SVG or a 300dpi PNG, and I will send a proof back.
         </>
       ) : (
         <>
-          Thank you. Send artwork to {mail} and I will send a proof back.
+          Thank you. Sign in with this email to {send} and I will send a proof
+          back.
         </>
       )}
     </div>

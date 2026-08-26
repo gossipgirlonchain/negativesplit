@@ -14,6 +14,7 @@ export default function Footer() {
           <div className="foot-links">
             <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             <a href="https://x.com/winternet">@winternet on X</a>
+            <a href="/sponsor">Send artwork</a>
             <a href="#positions">Positions</a>
             <a href="#faq">FAQ</a>
           </div>

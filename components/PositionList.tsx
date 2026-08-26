@@ -8,9 +8,16 @@ import { Fragment } from "react";
 import Reveal from "./Reveal";
 import { hoverHandlers, useHover } from "./HoverSync";
 import { GROUPS, buyHref, type Position } from "@/lib/positions";
+import type { PublicSponsor } from "@/lib/sponsors";
 import { money } from "@/lib/money";
 
-export default function PositionList({ sold }: { sold: string[] }) {
+export default function PositionList({
+  sold,
+  sponsors,
+}: {
+  sold: string[];
+  sponsors: Record<string, PublicSponsor>;
+}) {
   const soldSet = new Set(sold);
   const { active, setActive } = useHover();
 
@@ -32,6 +39,7 @@ export default function PositionList({ sold }: { sold: string[] }) {
                 key={position.no}
                 position={position}
                 isSold={soldSet.has(position.no)}
+                sponsor={sponsors[position.no]}
                 isActive={active === position.target}
                 setActive={setActive}
               />
@@ -46,11 +54,13 @@ export default function PositionList({ sold }: { sold: string[] }) {
 function Row({
   position,
   isSold,
+  sponsor,
   isActive,
   setActive,
 }: {
   position: Position;
   isSold: boolean;
+  sponsor?: PublicSponsor;
   isActive: boolean;
   setActive: (target: string | null) => void;
 }) {
@@ -64,8 +74,12 @@ function Row({
       data-target={position.target}
       {...hoverHandlers(position.target, setActive)}
       onClick={(e) => {
-        if (isSold) return;
         if ((e.target as HTMLElement).closest("a")) return;
+        if (sponsor?.url) {
+          window.open(sponsor.url, "_blank", "noopener,noreferrer");
+          return;
+        }
+        if (isSold) return;
         window.location.href = href;
       }}
     >
@@ -80,11 +94,32 @@ function Row({
           ) : null}
         </div>
         <div className="sub">{position.sub}</div>
+        {sponsor ? (
+          <a
+            className="sponsor"
+            href={sponsor.url || undefined}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={sponsor.logoUrl} alt="" />
+            <span>{sponsor.brand}</span>
+          </a>
+        ) : null}
       </div>
       <div className="sz">{position.size}</div>
       <div className="pr">{money(position.price)}</div>
       <div>
-        {isSold ? (
+        {sponsor?.url ? (
+          <a
+            className="btn sm quiet"
+            href={sponsor.url}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            Visit
+          </a>
+        ) : isSold ? (
           <span className="btn sm grey">Taken</span>
         ) : (
           <a className="btn sm quiet" href={href}>

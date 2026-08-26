@@ -22,6 +22,8 @@ app/
   api/
     visits/route.ts         POST -> { now, total }
     stripe/webhook/route.ts POST -> marks a position sold
+  sponsor/page.tsx          sponsors sign in and upload artwork
+  admin/page.tsx            you approve or reject it
 components/                 one component per section of the page
 lib/
   positions.ts              THE single source of truth for the board
@@ -40,6 +42,10 @@ One number is deliberately typed twice: `scripts/stripe-setup.mjs` carries its
 own copy of the price list, because it runs under plain `node` with no
 TypeScript loader. **If you change a price in `lib/positions.ts`, change it in
 the script too and re-run it.**
+
+**Sponsor artwork is never self-publishing.** An upload lands as `pending`
+and only appears on the board after it is approved at `/admin`. See
+[Sponsor artwork](#sponsor-artwork) below.
 
 **Sold state is not in the source.** It lives in KV, written by the Stripe
 webhook, read by `app/page.tsx` on a 30 second revalidate. A sale greys out its
@@ -164,6 +170,49 @@ Then buy one cheap position for real, confirm it goes grey, and refund yourself.
 
 ---
 
+## Sponsor artwork
+
+Once a position is paid for, its buyer can put their own logo on it.
+
+**The flow**
+
+1. Buyer pays. The webhook stores their Stripe email against the position.
+2. They go to `/sponsor` and sign in with Privy using that same email.
+3. They see only the positions that email paid for, and upload a logo plus a
+   link for each.
+4. The submission sits as `pending`. Nothing is public yet.
+5. You approve it at `/admin`. The logo takes over that plate in the drawing,
+   the row shows the brand and a Visit link, and hovering either one names the
+   sponsor and links out.
+
+Rejecting is the same click, with a note the sponsor sees on their own page. A
+resubmission pulls the old artwork off the board immediately and goes back to
+pending.
+
+**Setup**
+
+1. Create a new Privy app at dashboard.privy.io. It has to be its own app;
+   credentials from another project will not work. Enable **Email** as a login
+   method and add `https://negativesplit.space` to Allowed origins.
+2. Put the app ID in `NEXT_PUBLIC_PRIVY_APP_ID` and the secret in
+   `PRIVY_APP_SECRET`.
+3. Add Vercel Blob: dashboard → Storage → Create → Blob, connect it to the
+   project. That writes `BLOB_READ_WRITE_TOKEN`.
+4. Set `ADMIN_EMAILS` to the email you will sign in with. Anyone else gets 403
+   from every admin route.
+
+**Uploads** are capped at 2MB and limited to SVG, PNG, JPG and WebP. Links are
+normalised and anything that is not http or https is rejected, so no
+`javascript:` or `data:` URL reaches the page.
+
+**When the paying email is not the working email**, open `/admin`, hit
+*Reassign owner* on that position and enter the address they will sign in with.
+That override wins over the Stripe email.
+
+**A whole-board buyer** owns every position and sees all eleven upload forms.
+
+---
+
 ## Notes
 
 - **The counter never invents a number.** `/api/visits` answers 503 if KV is
@@ -183,3 +232,8 @@ Then buy one cheap position for real, confirm it goes grey, and refund yourself.
 See `.env.local.example`. All five are required in production:
 `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `KV_REST_API_URL`,
 `KV_REST_API_TOKEN`, `NEXT_PUBLIC_SITE_URL`.
+
+Four more are needed for sponsor sign in and artwork:
+`NEXT_PUBLIC_PRIVY_APP_ID`, `PRIVY_APP_SECRET`, `ADMIN_EMAILS`,
+`BLOB_READ_WRITE_TOKEN`. Without them the site still sells positions; the
+`/sponsor` page just tells buyers to email their artwork in.
