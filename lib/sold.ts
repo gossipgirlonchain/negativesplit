@@ -93,3 +93,35 @@ export async function releasePosition(no: string): Promise<void> {
   await kv().del(`sale:${no}`, `sponsor:${no}`, `owner:${no}`);
   await kv().hdel("sponsors:public", no);
 }
+
+export type SaleRecord = {
+  no: string;
+  email: string;
+  brand: string;
+  contact: string;
+  name: string;
+  amount: number;
+  currency: string;
+  session: string;
+  at: string;
+};
+
+/** The receipt for a position: who bought it, what they gave you, and
+ *  whether it came from Stripe or was marked by hand. */
+export async function getSale(no: string): Promise<SaleRecord | null> {
+  if (!kvConfigured()) return null;
+  const raw = await kv().hgetall<Record<string, unknown>>(`sale:${no}`);
+  if (!raw) return null;
+  const str = (v: unknown) => (v === null || v === undefined ? "" : String(v));
+  return {
+    no,
+    email: str(raw.email),
+    brand: str(raw.brand),
+    contact: str(raw.contact),
+    name: str(raw.name),
+    amount: Number(raw.amount ?? 0),
+    currency: str(raw.currency) || "usd",
+    session: str(raw.session),
+    at: str(raw.at),
+  };
+}

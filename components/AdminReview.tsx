@@ -4,7 +4,22 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useCallback, useEffect, useState } from "react";
 import { BY_NO } from "@/lib/positions";
 
-type BoardEntry = { no: string; name: string; sold: boolean };
+type Sale = {
+  email: string;
+  brand: string;
+  contact: string;
+  amount: number;
+  currency: string;
+  session: string;
+  at: string;
+};
+
+type BoardEntry = {
+  no: string;
+  name: string;
+  sold: boolean;
+  sale: Sale | null;
+};
 
 type Record_ = {
   no: string;
@@ -178,21 +193,24 @@ export default function AdminReview() {
             </button>
           </div>
           {board.map((entry) => (
-            <div className="board-row" key={entry.no}>
-              <span className="label">{entry.no}</span>
-              <span className="nm">{entry.name}</span>
-              <span className={`status ${entry.sold ? "rejected" : "approved"}`}>
-                {entry.sold ? "sold" : "available"}
-              </span>
-              <button
-                className="btn sm quiet"
-                disabled={busy === entry.no}
-                onClick={() =>
-                  void setBoardState(entry.no, entry.sold ? "release" : "sell")
-                }
-              >
-                {entry.sold ? "Release" : "Mark sold"}
-              </button>
+            <div key={entry.no}>
+              <div className="board-row">
+                <span className="label">{entry.no}</span>
+                <span className="nm">{entry.name}</span>
+                <span className={`status ${entry.sold ? "rejected" : "approved"}`}>
+                  {entry.sold ? "sold" : "available"}
+                </span>
+                <button
+                  className="btn sm quiet"
+                  disabled={busy === entry.no}
+                  onClick={() =>
+                    void setBoardState(entry.no, entry.sold ? "release" : "sell")
+                  }
+                >
+                  {entry.sold ? "Release" : "Mark sold"}
+                </button>
+              </div>
+              {entry.sale ? <SaleDetail sale={entry.sale} /> : null}
             </div>
           ))}
         </div>
@@ -266,5 +284,56 @@ export default function AdminReview() {
         </button>
       </div>
     </>
+  );
+}
+
+/** The receipt behind a sold position, so chasing artwork and answering
+ *  "who marked this sold" never needs a database console. */
+function SaleDetail({ sale }: { sale: Sale }) {
+  const manual = sale.session === "manual";
+  const paid = manual
+    ? "marked by hand, no payment"
+    : `${(sale.amount / 100).toLocaleString("en-US", {
+        style: "currency",
+        currency: (sale.currency || "usd").toUpperCase(),
+      })} via Stripe`;
+
+  return (
+    <dl className="sale">
+      <div>
+        <dt>Source</dt>
+        <dd>{paid}</dd>
+      </div>
+      {sale.brand ? (
+        <div>
+          <dt>Brand</dt>
+          <dd>{sale.brand}</dd>
+        </div>
+      ) : null}
+      {sale.contact ? (
+        <div>
+          <dt>Contact</dt>
+          <dd>{sale.contact}</dd>
+        </div>
+      ) : null}
+      {sale.email ? (
+        <div>
+          <dt>Email</dt>
+          <dd>{sale.email}</dd>
+        </div>
+      ) : null}
+      {sale.at ? (
+        <div>
+          <dt>When</dt>
+          <dd>{new Date(sale.at).toLocaleString()}</dd>
+        </div>
+      ) : null}
+      {!manual && sale.session ? (
+        <div>
+          <dt>Session</dt>
+          <dd>{sale.session}</dd>
+        </div>
+      ) : null}
+    </dl>
   );
 }
