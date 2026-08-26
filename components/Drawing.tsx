@@ -27,13 +27,15 @@ export default function Drawing({
   const calloutRef = useRef<SVGGElement>(null);
   const bgRef = useRef<SVGRectElement>(null);
   const txtRef = useRef<SVGTextElement>(null);
+  const imgRef = useRef<SVGImageElement>(null);
 
   useEffect(() => {
     const svg = svgRef.current;
     const callout = calloutRef.current;
     const bg = bgRef.current;
     const txt = txtRef.current;
-    if (!svg || !callout || !bg || !txt) return;
+    const img = imgRef.current;
+    if (!svg || !callout || !bg || !txt || !img) return;
 
     const p = active ? BY_TARGET[active] : undefined;
     const g = active
@@ -46,20 +48,60 @@ export default function Drawing({
     }
 
     const sponsor = sponsors[p.no];
-    const label = sponsor
-      ? `${p.name}  ·  ${sponsor.brand}`
-      : p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
-    txt.textContent = label;
-    const w = label.length * 6.6 + 26;
-    bg.setAttribute("width", String(w));
+    let width: number;
+    let height: number;
+
+    if (sponsor) {
+      // a sponsored position shows the mark big enough to actually read,
+      // with the brand under it. Clicking goes to their site.
+      const brand = sponsor.brand.toUpperCase();
+      width = Math.max(154, brand.length * 7.6 + 36);
+      height = 74;
+
+      bg.setAttribute("width", String(width));
+      bg.setAttribute("height", String(height));
+      bg.setAttribute("rx", "10");
+
+      img.setAttribute("href", sponsor.logoUrl);
+      img.setAttribute("x", "14");
+      img.setAttribute("y", "13");
+      img.setAttribute("width", String(width - 28));
+      img.setAttribute("height", "32");
+      img.style.display = "";
+
+      txt.textContent = brand;
+      txt.setAttribute("x", String(width / 2));
+      txt.setAttribute("y", "61");
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("font-size", "11");
+      txt.setAttribute("letter-spacing", "1.3");
+    } else {
+      const label =
+        p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
+      width = label.length * 6.6 + 26;
+      height = 30;
+
+      bg.setAttribute("width", String(width));
+      bg.setAttribute("height", String(height));
+      bg.setAttribute("rx", "15");
+
+      img.style.display = "none";
+
+      txt.textContent = label;
+      txt.setAttribute("x", "15");
+      txt.setAttribute("y", "20");
+      txt.setAttribute("text-anchor", "start");
+      txt.setAttribute("font-size", "14");
+      txt.setAttribute("letter-spacing", "0");
+    }
 
     const vb = svg.viewBox.baseVal;
     const bb = g.getBBox();
     const x = Math.max(
       vb.x + 4,
-      Math.min(vb.x + vb.width - w - 4, bb.x + bb.width / 2 - w / 2),
+      Math.min(vb.x + vb.width - width - 4, bb.x + bb.width / 2 - width / 2),
     );
-    let y = bb.y - 34;
+    let y = bb.y - (height + 4);
     if (y < vb.y + 4) y = bb.y + bb.height + 12;
 
     callout.setAttribute("transform", `translate(${x},${y})`);
@@ -287,6 +329,12 @@ export default function Drawing({
 
       <g className="callout" ref={calloutRef} style={{ opacity: 0 }}>
         <rect ref={bgRef} className="cbg" x="0" y="0" width="200" height="30" rx="15" fill="var(--text)" />
+        <image
+          ref={imgRef}
+          className="clogo"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ display: "none" }}
+        />
         <text
           ref={txtRef}
           className="ctx"

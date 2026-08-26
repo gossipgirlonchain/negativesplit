@@ -451,3 +451,6 @@ footer { border-top:1px solid var(--line2); padding:46px 0 70px; }
 
 .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
 .btn:disabled { opacity:.45; pointer-events:none; }
+
+/* the callout never eats its own hover */
+.callout { pointer-events:none; transition:opacity .18s ease; }
