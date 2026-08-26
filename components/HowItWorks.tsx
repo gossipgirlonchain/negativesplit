@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import { CONTACT_EMAIL } from "@/lib/positions";
 
 const STEPS = [
   {
@@ -9,7 +10,7 @@ const STEPS = [
   {
     n: "STEP 02",
     title: "Send artwork",
-    body: "Vector SVG or AI preferred, PNG at 300dpi accepted. Kit panels go to the printer as one file, so those close October 24. Frame positions I cut on outdoor vinyl and proof by photo before anything is applied.",
+    body: `Upload it after checkout, or email it to ${CONTACT_EMAIL}. Vector SVG or AI preferred, PNG at 300dpi accepted. Kit panels go to the printer as one file, so those close October 24. Frame positions I cut on outdoor vinyl and proof by photo before anything is applied.`,
   },
   {
     n: "STEP 03",

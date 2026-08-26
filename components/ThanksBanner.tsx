@@ -5,7 +5,7 @@
    statically rendered, and clears it from the URL afterwards. */
 
 import { useEffect, useState } from "react";
-import { BY_NO, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { BY_NO, CONTACT_EMAIL, TAKE_ALL, TOTAL_N } from "@/lib/positions";
 
 export default function ThanksBanner() {
   const [claimed, setClaimed] = useState<string | null>(null);
@@ -56,6 +56,11 @@ export default function ThanksBanner() {
       send your artwork
     </a>
   );
+  const mail = (
+    <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "var(--accent)" }}>
+      {CONTACT_EMAIL}
+    </a>
+  );
 
   return (
     <div className="thanks show">
@@ -66,17 +71,18 @@ export default function ThanksBanner() {
             No. {position.no}, {position.name}
           </b>{" "}
           is yours. Sign in with this email to {send}, an SVG or a 300dpi PNG,
-          and I will send a proof back.
+          or just email it to {mail}. Either way you get a proof back.
         </>
       ) : claimed === TAKE_ALL.no ? (
         <>
           Thank you. <b>All {TOTAL_N} positions</b> are yours. Sign in with this
-          email to {send}, an SVG or a 300dpi PNG, and I will send a proof back.
+          email to {send}, an SVG or a 300dpi PNG, or just email it to {mail}.
+          Either way you get a proof back.
         </>
       ) : (
         <>
-          Thank you. Sign in with this email to {send} and I will send a proof
-          back.
+          Thank you. Sign in with this email to {send}, or email it to {mail},
+          and I will send a proof back.
         </>
       )}
     </div>

@@ -13,6 +13,20 @@ type Artwork = {
   note: string;
 } | null;
 
+/** Prefilled email, for when the uploader will not play ball. */
+function artworkMailto(positions: Owned[], one?: Owned): string {
+  const list = one
+    ? `No. ${one.no}, ${one.name}`
+    : positions.map((p) => `No. ${p.no}, ${p.name}`).join("\n");
+  const subject = one
+    ? `Negative Split artwork - No. ${one.no}`
+    : "Negative Split artwork";
+  const body = `Hi Winny,\n\nArtwork attached for:\n${list}\n\nBrand:\nLink:\n\n`;
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+    subject,
+  )}&body=${encodeURIComponent(body)}`;
+}
+
 type Owned = {
   no: string;
   name: string;
@@ -78,7 +92,9 @@ export default function SponsorDashboard() {
         </div>
         <p className="msg ok">
           SVG is best. PNG, JPG or WebP at 300dpi also work. Keep it under 2MB.
-          Artwork is reviewed before it appears on the board.
+          Artwork is reviewed before it appears on the board. If the uploader
+          will not take your file, email it to {CONTACT_EMAIL} and it gets done
+          by hand.
         </p>
         <div style={{ marginTop: 16 }}>
           <button className="btn sm quiet" onClick={() => void logout()}>
@@ -99,9 +115,26 @@ export default function SponsorDashboard() {
           </p>
         </div>
       ) : (
-        positions.map((position) => (
-          <ArtworkForm key={position.no} position={position} onSaved={load} />
-        ))
+        <>
+          {positions.map((position) => (
+            <ArtworkForm key={position.no} position={position} onSaved={load} />
+          ))}
+
+          <div className="card panel">
+            <h3>Or just email it</h3>
+            <p className="msg ok">
+              If the uploader gives you any trouble, send the file to{" "}
+              {CONTACT_EMAIL} and it gets put on the board by hand. SVG is best,
+              or a PNG at 300dpi. Say which position it is for and include the
+              link you want the logo to point at.
+            </p>
+            <div className="actions">
+              <a className="btn" href={artworkMailto(positions)}>
+                Email my artwork
+              </a>
+            </div>
+          </div>
+        </>
       )}
     </>
   );
@@ -221,7 +254,18 @@ function ArtworkForm({
       </form>
 
       {message ? (
-        <p className={`msg ${failed ? "err" : "ok"}`}>{message}</p>
+        <p className={`msg ${failed ? "err" : "ok"}`}>
+          {message}
+          {failed ? (
+            <>
+              {" "}
+              <a href={artworkMailto([position], position)} style={{ color: "var(--accent)" }}>
+                Email it to {CONTACT_EMAIL} instead
+              </a>{" "}
+              and it goes on by hand.
+            </>
+          ) : null}
+        </p>
       ) : null}
     </div>
   );
