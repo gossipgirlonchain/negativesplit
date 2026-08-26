@@ -62,12 +62,30 @@ export async function POST(req: Request) {
     return bad("logo must be an SVG, PNG, JPG or WebP");
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.error("[artwork] BLOB_READ_WRITE_TOKEN is not set");
+    return Response.json(
+      { error: "File storage is not configured yet. Tell Winny." },
+      { status: 503 },
+    );
+  }
+
+  // Logos have to be publicly readable: the URL is rendered straight into
+  // the drawing. If the store refuses public blobs this is where it shows up,
+  // so say what actually went wrong rather than throwing a blank 500.
   const path = `logos/${no}.${EXTENSION[file.type]}`;
-  const blob = await put(path, file, {
-    access: "public",
-    addRandomSuffix: true,
-    contentType: file.type,
-  });
+  let blob;
+  try {
+    blob = await put(path, file, {
+      access: "public",
+      addRandomSuffix: true,
+      contentType: file.type,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown error";
+    console.error(`[artwork] blob upload failed for ${no}:`, message);
+    return Response.json({ error: `Upload failed: ${message}` }, { status: 502 });
+  }
 
   await submitArtwork({
     no,
