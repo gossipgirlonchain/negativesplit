@@ -6,9 +6,11 @@ import type { PublicSponsor } from "@/lib/sponsors";
 export default function Sheet({
   sold,
   sponsors,
+  links,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  links: Record<string, string>;
 }) {
   return (
     <Reveal className="sheet">
@@ -35,7 +37,7 @@ export default function Sheet({
         </div>
       </div>
       <div className="hero-scroll">
-        <Drawing sold={sold} sponsors={sponsors} />
+        <Drawing sold={sold} sponsors={sponsors} links={links} />
       </div>
     </Reveal>
   );

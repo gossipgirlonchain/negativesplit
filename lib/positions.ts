@@ -192,8 +192,13 @@ export const STRIPE_LINKS: Record<string, string> = {
   TITLE: "",
 };
 
-export function buyHref(no: string, label: string): string {
-  const link = STRIPE_LINKS[no];
+export function buyHref(
+  no: string,
+  label: string,
+  live?: Record<string, string>,
+): string {
+  // live links from Stripe win, then anything pasted in below, then email
+  const link = live?.[no] || STRIPE_LINKS[no];
   if (link) return link;
   const subject = `${SITE_NAME} - claiming No. ${no} (${label})`;
   const body = `Hi Winny,\n\nI want No. ${no} - ${label}.\n\nBrand:\nArtwork format:\n\n`;

@@ -19,6 +19,7 @@ export default function AdminReview() {
   const [records, setRecords] = useState<Record_[] | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
+  const [linkState, setLinkState] = useState("");
 
   const load = useCallback(async () => {
     setError("");
@@ -44,6 +45,29 @@ export default function AdminReview() {
   useEffect(() => {
     if (authenticated) void load();
   }, [authenticated, load]);
+
+  async function syncLinks() {
+    setLinkState("Creating any missing links in Stripe...");
+    const token = await getAccessToken();
+    const res = await fetch("/api/admin/sync-links", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = (await res.json()) as {
+      error?: string;
+      created?: string[];
+      existing?: string[];
+      total?: number;
+    };
+    if (!res.ok) {
+      setLinkState(data.error ?? "Could not create links.");
+      return;
+    }
+    const created = data.created?.length ?? 0;
+    setLinkState(
+      `${data.total} positions have a checkout link. ${created} created just now, ${data.existing?.length ?? 0} already existed.`,
+    );
+  }
 
   async function review(no: string, decision: "approve" | "reject") {
     const note =
@@ -99,6 +123,23 @@ export default function AdminReview() {
 
   return (
     <>
+      <div className="card panel">
+        <div className="head">
+          <h3>Checkout links</h3>
+        </div>
+        <p className="msg ok">
+          Creates the Stripe product, price and payment link for every position
+          that does not have one. Safe to press twice: it reuses anything that
+          already exists. Until this is done, Claim buttons fall back to email.
+        </p>
+        <div className="actions">
+          <button className="btn sm" onClick={() => void syncLinks()}>
+            Create payment links
+          </button>
+        </div>
+        {linkState ? <p className="msg ok">{linkState}</p> : null}
+      </div>
+
       {error ? <p className="msg err">{error}</p> : null}
 
       {records === null ? null : records.length === 0 ? (

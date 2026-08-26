@@ -14,9 +14,11 @@ import { money } from "@/lib/money";
 export default function PositionList({
   sold,
   sponsors,
+  links,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  links: Record<string, string>;
 }) {
   const soldSet = new Set(sold);
   const { active, setActive } = useHover();
@@ -40,6 +42,7 @@ export default function PositionList({
                 position={position}
                 isSold={soldSet.has(position.no)}
                 sponsor={sponsors[position.no]}
+                href={buyHref(position.no, position.name, links)}
                 isActive={active === position.target}
                 setActive={setActive}
               />
@@ -55,16 +58,17 @@ function Row({
   position,
   isSold,
   sponsor,
+  href,
   isActive,
   setActive,
 }: {
   position: Position;
   isSold: boolean;
   sponsor?: PublicSponsor;
+  href: string;
   isActive: boolean;
   setActive: (target: string | null) => void;
 }) {
-  const href = buyHref(position.no, position.name);
 
   return (
     <div

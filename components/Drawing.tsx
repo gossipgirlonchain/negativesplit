@@ -16,9 +16,11 @@ import { ZONES, ZONE_ORDER } from "./zones";
 export default function Drawing({
   sold,
   sponsors,
+  links,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  links: Record<string, string>;
 }) {
   const soldSet = useMemo(() => new Set(sold), [sold]);
   const { active, setActive } = useHover();
@@ -117,7 +119,7 @@ export default function Drawing({
         window.open(sponsor.url, "_blank", "noopener,noreferrer");
         return;
       }
-      if (!isSold) window.location.href = buyHref(p.no, p.name);
+      if (!isSold) window.location.href = buyHref(p.no, p.name, links);
     };
     return {
       id: target,

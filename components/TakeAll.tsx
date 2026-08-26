@@ -2,8 +2,14 @@ import Reveal from "./Reveal";
 import { INVENTORY, TAKE_ALL, TOTAL_N, buyHref } from "@/lib/positions";
 import { money } from "@/lib/money";
 
-export default function TakeAll({ taken }: { taken: boolean }) {
-  const href = buyHref(TAKE_ALL.no, `All ${TOTAL_N} positions`);
+export default function TakeAll({
+  taken,
+  links,
+}: {
+  taken: boolean;
+  links: Record<string, string>;
+}) {
+  const href = buyHref(TAKE_ALL.no, `All ${TOTAL_N} positions`, links);
 
   return (
     <section className="tight">

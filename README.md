@@ -73,13 +73,20 @@ export SITE_URL=http://localhost:3000
 node scripts/stripe-setup.mjs
 ```
 
-It prints a block of payment link URLs. Paste them over `STRIPE_LINKS` in
-`lib/positions.ts` — same keys, `"01"` through `"11"` plus `"TITLE"`. Any
-position left blank falls back to a prefilled email, so a missing link costs a
-lead, not a sale.
+**You no longer paste anything.** The site reads live payment links straight
+from Stripe, matched on the `metadata.position` the script writes. Create them
+and the Claim buttons switch from email to real checkout on the next
+revalidate.
 
-The script is idempotent by `lookup_key`. Running it again reuses whatever it
-already made.
+Two ways to create them, both idempotent:
+
+- **From the site**: sign in at `/admin` and press **Create payment links**.
+  No terminal, no local key. This is the easy one.
+- **From the terminal**: the script above.
+
+`STRIPE_LINKS` in `lib/positions.ts` still exists as a manual override for a
+one-off link, but it can stay empty. A position with no link anywhere falls
+back to a prefilled email, so a missing link costs a lead, not a sale.
 
 ## 3. Wire the webhook locally
 
