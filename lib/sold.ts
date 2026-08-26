@@ -1,0 +1,69 @@
+import { kv } from "@vercel/kv";
+import type Stripe from "stripe";
+import { POSITIONS, TAKE_ALL } from "./positions";
+
+/* ============================================================
+   SOLD STATE
+
+   A set of position numbers in KV, written by the Stripe webhook
+   and read by the page. The source file never knows what sold —
+   that is the whole point of the migration.
+
+     sold:positions   set of "01" ... "11" and "TITLE"
+     sale:<no>        hash: brand, contact, email, amount, session, at
+   ============================================================ */
+
+const SOLD_KEY = "sold:positions";
+
+/** True once KV credentials are present. Absent locally is fine and
+ *  means "nothing has sold"; absent in production is a misconfiguration. */
+export function kvConfigured(): boolean {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+/**
+ * Position numbers that have been paid for.
+ *
+ * If KV is not configured at all (local dev, first build) this returns
+ * an empty set so the site still renders. If KV *is* configured and the
+ * read fails, it throws: with `revalidate = 30` Next keeps serving the
+ * last good page rather than redrawing a sold position as available,
+ * which is the one bug that costs a customer twice.
+ */
+export async function getSold(): Promise<Set<string>> {
+  if (!kvConfigured()) return new Set();
+  const members = await kv.smembers<unknown[]>(SOLD_KEY);
+  // The KV client deserializes what it reads, and "11" round-trips as the
+  // number 11 while "01" stays a string. Force everything back to strings
+  // or position 11 silently stays on sale after it has been paid for.
+  return new Set((members ?? []).map((m) => String(m)));
+}
+
+/**
+ * Mark a position sold and keep the buyer's details so artwork can be chased.
+ * Buying the whole board (TITLE) closes every position with it.
+ */
+export async function markSold(
+  no: string,
+  session: Stripe.Checkout.Session,
+): Promise<void> {
+  const fields = session.custom_fields ?? [];
+  const field = (key: string) =>
+    fields.find((f) => f.key === key)?.text?.value ?? "";
+
+  await kv.hset(`sale:${no}`, {
+    brand: field("brand"),
+    contact: field("contact"),
+    email: session.customer_details?.email ?? "",
+    name: session.customer_details?.name ?? "",
+    amount: session.amount_total ?? 0,
+    currency: session.currency ?? "usd",
+    session: session.id,
+    at: new Date().toISOString(),
+  });
+
+  const alsoClosed =
+    no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
+
+  await kv.sadd(SOLD_KEY, no, ...alsoClosed);
+}
