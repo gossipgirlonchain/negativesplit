@@ -1,4 +1,5 @@
 import { kv, kvConfigured } from "./kv";
+import { manifestSponsors } from "./sponsor-manifest";
 import { POSITIONS, TAKE_ALL } from "./positions";
 import { ownerKey, publicSponsorsKey, saleKey, sponsorKey } from "./boards";
 
@@ -47,11 +48,14 @@ const str = (v: unknown): string => (v === null || v === undefined ? "" : String
 export async function getApprovedSponsors(
   board = "",
 ): Promise<Record<string, PublicSponsor>> {
-  if (!kvConfigured()) return {};
-  const raw = await kv().hgetall<Record<string, unknown>>(publicSponsorsKey(board));
-  if (!raw) return {};
+  // the manifest is the starting point; anything published from /admin
+  // is written over the top of it
+  const out: Record<string, PublicSponsor> = { ...manifestSponsors(board) };
 
-  const out: Record<string, PublicSponsor> = {};
+  if (!kvConfigured()) return out;
+  const raw = await kv().hgetall<Record<string, unknown>>(publicSponsorsKey(board));
+  if (!raw) return out;
+
   for (const [no, value] of Object.entries(raw)) {
     const parsed = typeof value === "string" ? safeParse(value) : value;
     if (!parsed || typeof parsed !== "object") continue;
