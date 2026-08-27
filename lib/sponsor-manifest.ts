@@ -48,12 +48,20 @@ const MANIFEST: Record<string, ManifestEntry> = {
     url: "https://doorvana.com",
     logo: "/sponsors/doorvana.svg",
   },
-  "07": { brand: "LO:TECH", url: "https://lo.tech" },
+  "07": {
+    brand: "LO:TECH",
+    url: "https://lo.tech",
+    logo: "/sponsors/lotech.jpg",
+  },
   "08": { brand: "⚡️CMDK", url: "https://cmdk.email" },
-  "09": { brand: "Soup", url: "https://trysoup.xyz" },
+  "09": { brand: "Soup", url: "https://trysoup.xyz", logo: "/sponsors/soup.jpg" },
   "10": { brand: "Good Marketing", url: "https://jamesrichardfry.com" },
   // UNCONFIRMED: no company domain on the sale, handle was Babesnet_xyz
-  "11": { brand: "Babes Net", url: "https://x.com/Babesnet_xyz" },
+  "11": {
+    brand: "Babes Net",
+    url: "https://x.com/Babesnet_xyz",
+    logo: "/sponsors/babesnet.jpg",
+  },
   "12": {
     brand: "polarchain",
     url: "https://x.com/post_polar_",
@@ -79,10 +87,14 @@ const MANIFEST: Record<string, ManifestEntry> = {
   "17": { brand: "Joe Hovanec" },
   "18": {
     brand: "Octant",
-    url: "https://octantlabs.io",
+    url: "https://x.com/octantapp",
     logo: "/sponsors/octant.png",
   },
-  "19": { brand: "Relayzero", url: "https://relayzero.com" },
+  "19": {
+    brand: "Relayzero",
+    url: "https://relayzero.com",
+    logo: "/sponsors/relayzero.jpg",
+  },
   // supplied white only, recoloured to the board text colour so it reads
   "20": { brand: "Last", url: "https://golast.xyz", logo: "/sponsors/last.svg" },
   // UNCONFIRMED: marked by hand, no payment and no details yet
