@@ -111,7 +111,6 @@ function Row({
           </a>
         ) : null}
       </div>
-      <div className="sz">{position.size}</div>
       <div className="pr">{money(position.price)}</div>
       <div>
         {sponsor?.url ? (

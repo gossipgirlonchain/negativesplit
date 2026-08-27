@@ -30,7 +30,6 @@ function artworkMailto(positions: Owned[], one?: Owned): string {
 type Owned = {
   no: string;
   name: string;
-  size: string;
   price: number;
   artwork: Artwork;
 };
@@ -195,9 +194,7 @@ function ArtworkForm({
       <div className="head">
         <span className="label">No. {position.no}</span>
         <h3>{position.name}</h3>
-        <span className="label">
-          {position.size} · {money(position.price)}
-        </span>
+        <span className="label">{money(position.price)}</span>
       </div>
 
       {artwork ? (

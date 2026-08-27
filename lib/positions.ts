@@ -23,7 +23,6 @@ export type Position = {
   target: string;
   name: string;
   sub: string;
-  size: string;
   price: number;
   tag?: string;
 };
@@ -50,7 +49,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-front-up",
         name: "Front panel, upper",
         sub: "Chest. Every photo taken of my face, and the finish chute.",
-        size: "12 × 8 cm",
         price: 600,
         tag: "Best on the board",
       },
@@ -59,7 +57,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-back-up",
         name: "Back panel, upper",
         sub: "56 miles of bike and 13.1 of run, seen by everyone behind me.",
-        size: "14 × 10 cm",
         price: 500,
         tag: "Most minutes",
       },
@@ -68,7 +65,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-front-lo",
         name: "Front panel, lower",
         sub: "Bigger than the chest, but the aero position folds it. Priced for that.",
-        size: "14 × 10 cm",
         price: 350,
       },
       {
@@ -76,7 +72,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-back-lo",
         name: "Back panel, lower",
         sub: "Dead centre of every photo taken from a following bike.",
-        size: "14 × 10 cm",
         price: 300,
       },
       {
@@ -84,7 +79,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-sleeves",
         name: "Sleeves, pair",
         sub: "In frame on every photo shot from the aero position.",
-        size: "7 × 5 cm ×2",
         price: 225,
       },
       {
@@ -92,7 +86,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-f1",
         name: "Waist tab, front left",
         sub: "Left of the waistband, front. Sold on its own.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -100,7 +93,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-f2",
         name: "Waist tab, front centre",
         sub: "Dead centre of the waistband, front.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -108,7 +100,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-f3",
         name: "Waist tab, front right",
         sub: "Right of the waistband, front. Sold on its own.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -116,7 +107,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-b1",
         name: "Waist tab, back left",
         sub: "Left of the waistband, back.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -124,7 +114,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-b2",
         name: "Waist tab, back centre",
         sub: "Dead centre of the waistband, seen from every following wheel.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -132,7 +121,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-waist-b3",
         name: "Waist tab, back right",
         sub: "Right of the waistband, back.",
-        size: "4 × 4 cm",
         price: 200,
       },
       {
@@ -140,7 +128,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-leg-fl",
         name: "Front thigh, left",
         sub: "In shot for 56 miles of bike and 13.1 of run.",
-        size: "5 × 4 cm",
         price: 250,
       },
       {
@@ -148,7 +135,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-leg-fr",
         name: "Front thigh, right",
         sub: "Same panel, other leg, sold on its own.",
-        size: "5 × 4 cm",
         price: 250,
       },
       {
@@ -156,7 +142,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-leg-bl",
         name: "Back thigh, left",
         sub: "Facing the camera on every climb.",
-        size: "5 × 4 cm",
         price: 250,
       },
       {
@@ -164,7 +149,6 @@ export const GROUPS: PositionGroup[] = [
         target: "k-leg-br",
         name: "Back thigh, right",
         sub: "Same panel, other leg, sold on its own.",
-        size: "5 × 4 cm",
         price: 250,
       },
     ],
@@ -178,7 +162,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-dt-low",
         name: "Down tube, lower half",
         sub: "Both sides. Where the manufacturer's name normally goes.",
-        size: "11 × 7 cm ×2",
         price: 400,
         tag: "Biggest panel",
       },
@@ -187,7 +170,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-dt-up",
         name: "Down tube, upper half",
         sub: "Both sides. Same panel, forward of the split line.",
-        size: "11 × 7 cm ×2",
         price: 300,
       },
       {
@@ -195,7 +177,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-fork",
         name: "Fork blades",
         sub: "Both sides. Head on, in the aero tuck.",
-        size: "14 × 3 cm ×2",
         price: 175,
       },
       {
@@ -203,7 +184,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-helmet",
         name: "Helmet, sides",
         sub: "Leaves the bike and follows me onto the run.",
-        size: "8 × 4 cm ×2",
         price: 175,
       },
       {
@@ -211,7 +191,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-helmet-f",
         name: "Helmet, front",
         sub: "Straight down the barrel of every finish line camera.",
-        size: "7 × 4 cm",
         price: 150,
         tag: "On camera",
       },
@@ -220,7 +199,6 @@ export const GROUPS: PositionGroup[] = [
         target: "b-headtube",
         name: "Head tube",
         sub: "Small, front on, the cheapest way in.",
-        size: "6 × 4 cm",
         price: 125,
         tag: "Entry",
       },

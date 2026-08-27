@@ -45,11 +45,11 @@ export default function Faq() {
           </summary>
           <div className="ans">
             <p>
-              The top tube on most tri bikes is about 3cm tall, and a logo cut to
-              3cm reads as a smudge from more than a metre away. Same for the
-              aero bar extensions: narrow, curved, and covered by my forearms for
-              56 miles. I would rather not sell you something that photographs
-              badly.
+              The top tube on most tri bikes is too shallow for a logo to read,
+              and anything cut that small turns into a smudge from any distance.
+              Same for the aero bar extensions: narrow, curved, and covered by my
+              forearms for the whole bike leg. I would rather not sell you
+              something that photographs badly.
             </p>
             <p>
               The wheels are off the board because I do not yet know what wheels

@@ -30,7 +30,6 @@ export async function GET(req: Request) {
     owned.push({
       no,
       name: position.name,
-      size: position.size,
       price: position.price,
       artwork: await getSponsorRecord(no),
     });

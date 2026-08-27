@@ -278,25 +278,6 @@ export default function Drawing({
         <path className="stroke" d="M628 140 C654 140 663 158 661 180" strokeWidth="10" />
       </g>
 
-      {/* ---------- dimensions ---------- */}
-      <g className="dim">
-        <line x1="163" y1="414" x2="537" y2="414" />
-        <line x1="163" y1="407" x2="163" y2="421" />
-        <line x1="537" y1="407" x2="537" y2="421" />
-      </g>
-      <text className="dimtext" x="350" y="407" textAnchor="middle">
-        985 MM
-      </text>
-
-      <g className="dim">
-        <line x1="796" y1="258" x2="902.4" y2="258" />
-        <line x1="796" y1="252" x2="796" y2="264" />
-        <line x1="902.4" y1="252" x2="902.4" y2="264" />
-      </g>
-      <text className="dimtext" x="849.2" y="251" textAnchor="middle">
-        14 CM
-      </text>
-
       {/* ---------- labels ---------- */}
       <text className="tag" x="849.2" y="400" textAnchor="middle">
         FRONT
