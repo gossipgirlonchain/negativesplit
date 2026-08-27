@@ -55,11 +55,10 @@ const MANIFEST: Record<string, ManifestEntry> = {
   },
   "08": { brand: "⚡️CMDK", url: "https://cmdk.email" },
   "09": { brand: "Soup", url: "https://trysoup.xyz", logo: "/sponsors/soup.jpg" },
-  "10": { brand: "Good Marketing", url: "https://jamesrichardfry.com" },
-  // UNCONFIRMED: no company domain on the sale, handle was Babesnet_xyz
+  "10": { brand: "Good Marketing", url: "https://x.com/jamesrichardfry" },
   "11": {
     brand: "Babes Net",
-    url: "https://x.com/Babesnet_xyz",
+    url: "https://babesnet.xyz",
     logo: "/sponsors/babesnet.jpg",
   },
   "12": {
