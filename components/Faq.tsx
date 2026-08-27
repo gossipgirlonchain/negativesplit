@@ -1,4 +1,4 @@
-import { TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { CHEAPEST } from "@/lib/positions";
 import { money } from "@/lib/money";
 
 export default function Faq() {
@@ -104,9 +104,9 @@ export default function Faq() {
           <summary>Can I buy more than one?</summary>
           <div className="ans">
             <p>
-              Yes. Buy them one at a time, or take everything for{" "}
-              {money(TAKE_ALL.price)} flat and end it. All {TOTAL_N} positions,
-              one brand.
+              Yes. Buy them one at a time, as many as you want. Nothing stops
+              one brand taking several, and the cheapest way in is{" "}
+              {money(CHEAPEST)}.
             </p>
           </div>
         </details>

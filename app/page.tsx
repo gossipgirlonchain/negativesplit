@@ -9,9 +9,8 @@ import Progress from "@/components/Progress";
 import RaceSpec from "@/components/RaceSpec";
 import Rules from "@/components/Rules";
 import Sheet from "@/components/Sheet";
-import TakeAll from "@/components/TakeAll";
 import ThanksBanner from "@/components/ThanksBanner";
-import { POSITIONS, TAKE_ALL, openCount, raised } from "@/lib/positions";
+import { openCount, raised } from "@/lib/positions";
 import { getSold } from "@/lib/sold";
 import { getApprovedSponsors } from "@/lib/sponsors";
 
@@ -26,9 +25,6 @@ export default async function Page() {
     getApprovedSponsors(),
   ]);
   const soldList = [...sold];
-
-  const takenAll =
-    sold.has(TAKE_ALL.no) || POSITIONS.every((p) => sold.has(p.no));
 
   return (
     <>
@@ -46,7 +42,6 @@ export default async function Page() {
             <PositionList sold={soldList} sponsors={sponsors} />
           </div>
 
-          <TakeAll taken={takenAll} />
           <Rules />
           <HowItWorks />
           <RaceSpec />

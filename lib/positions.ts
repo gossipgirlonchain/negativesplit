@@ -235,8 +235,11 @@ export const POSITIONS: Position[] = GROUPS.flatMap((g) => g.items);
 /** Total if every position is sold one at a time. */
 export const INVENTORY = POSITIONS.reduce((sum, p) => sum + p.price, 0);
 
-/** How many positions exist. Drives every "11" in the copy. */
+/** How many positions exist. Drives every count in the copy. */
 export const TOTAL_N = POSITIONS.length;
+
+/** The cheapest way onto the board. */
+export const CHEAPEST = Math.min(...POSITIONS.map((p) => p.price));
 
 export const BY_NO: Record<string, Position> = Object.fromEntries(
   POSITIONS.map((p) => [p.no, p]),

@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { SITE_NAME, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { CHEAPEST, SITE_NAME, TOTAL_N } from "@/lib/positions";
 import { money } from "@/lib/money";
 
 export const alt = "Negative Split — your brand, on my Ironman journey.";
@@ -93,10 +93,10 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", alignItems: "flex-end", gap: 28 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ fontSize: 20, letterSpacing: 3, color: "#8FA0AE" }}>
-              THE WHOLE BOARD
+              POSITIONS FROM
             </div>
             <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: -2 }}>
-              {money(TAKE_ALL.price)}
+              {money(CHEAPEST)}
             </div>
           </div>
           <div
