@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import PrivyClientProvider from "@/components/PrivyClientProvider";
+import { MAIN } from "@/lib/boards";
 import SponsorDashboard from "@/components/SponsorDashboard";
 import { CONTACT_EMAIL } from "@/lib/positions";
 
@@ -16,7 +17,7 @@ export default function SponsorPage() {
 
   return (
     <>
-      <Nav />
+      <Nav board={MAIN} />
       <main id="top">
         <section className="tight">
           <div className="narrow">
@@ -43,7 +44,7 @@ export default function SponsorPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer board={MAIN} />
     </>
   );
 }

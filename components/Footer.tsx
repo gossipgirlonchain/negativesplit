@@ -1,6 +1,7 @@
-import { CONTACT_EMAIL, SITE_NAME } from "@/lib/positions";
+import type { Board } from "@/lib/boards";
+import { SITE_NAME } from "@/lib/positions";
 
-export default function Footer() {
+export default function Footer({ board }: { board: Board }) {
   return (
     <footer>
       <div className="wrap">
@@ -12,9 +13,9 @@ export default function Footer() {
             </div>
           </div>
           <div className="foot-links">
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-            <a href="https://x.com/winternet">@winternet on X</a>
-            <a href="/sponsor">Send artwork</a>
+            <a href={`mailto:${board.contactEmail}`}>{board.contactEmail}</a>
+            <a href={board.socialHref}>{board.socialLabel}</a>
+            {board.uploads ? <a href="/sponsor">Send artwork</a> : null}
             <a href="#positions">Positions</a>
             <a href="#faq">FAQ</a>
           </div>

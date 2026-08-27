@@ -1,6 +1,13 @@
 import { kv, kvConfigured } from "./kv";
 import type Stripe from "stripe";
 import { POSITIONS, TAKE_ALL } from "./positions";
+import {
+  ownerKey,
+  publicSponsorsKey,
+  saleKey,
+  soldKey,
+  sponsorKey,
+} from "./boards";
 
 /* ============================================================
    SOLD STATE
@@ -13,7 +20,6 @@ import { POSITIONS, TAKE_ALL } from "./positions";
      sale:<no>        hash: brand, contact, email, amount, session, at
    ============================================================ */
 
-const SOLD_KEY = "sold:positions";
 
 export { kvConfigured };
 
@@ -26,9 +32,9 @@ export { kvConfigured };
  * last good page rather than redrawing a sold position as available,
  * which is the one bug that costs a customer twice.
  */
-export async function getSold(): Promise<Set<string>> {
+export async function getSold(board = ""): Promise<Set<string>> {
   if (!kvConfigured()) return new Set();
-  const members = await kv().smembers<unknown[]>(SOLD_KEY);
+  const members = await kv().smembers<unknown[]>(soldKey(board));
   // The KV client deserializes what it reads, and "11" round-trips as the
   // number 11 while "01" stays a string. Force everything back to strings
   // or position 11 silently stays on sale after it has been paid for.
@@ -42,12 +48,13 @@ export async function getSold(): Promise<Set<string>> {
 export async function markSold(
   no: string,
   session: Stripe.Checkout.Session,
+  board = "",
 ): Promise<void> {
   const fields = session.custom_fields ?? [];
   const field = (key: string) =>
     fields.find((f) => f.key === key)?.text?.value ?? "";
 
-  await kv().hset(`sale:${no}`, {
+  await kv().hset(saleKey(board, no), {
     brand: field("brand"),
     contact: field("contact"),
     email: session.customer_details?.email ?? "",
@@ -61,7 +68,7 @@ export async function markSold(
   const alsoClosed =
     no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
 
-  await kv().sadd(SOLD_KEY, no, ...alsoClosed);
+  await kv().sadd(soldKey(board), no, ...alsoClosed);
 }
 
 /* ---------- manual overrides ----------
@@ -70,8 +77,12 @@ export async function markSold(
    the payment. */
 
 /** Mark a position sold by hand and record who owns it. */
-export async function setSoldManually(no: string, email: string): Promise<void> {
-  await kv().hset(`sale:${no}`, {
+export async function setSoldManually(
+  no: string,
+  email: string,
+  board = "",
+): Promise<void> {
+  await kv().hset(saleKey(board, no), {
     brand: "",
     contact: "",
     email: email.trim().toLowerCase(),
@@ -83,15 +94,15 @@ export async function setSoldManually(no: string, email: string): Promise<void> 
   });
 
   const alsoClosed = no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
-  await kv().sadd(SOLD_KEY, no, ...alsoClosed);
+  await kv().sadd(soldKey(board), no, ...alsoClosed);
 }
 
 /** Put a position back on the board and forget its artwork. */
-export async function releasePosition(no: string): Promise<void> {
+export async function releasePosition(no: string, board = ""): Promise<void> {
   const alsoOpened = no === TAKE_ALL.no ? POSITIONS.map((p) => p.no) : [];
-  await kv().srem(SOLD_KEY, no, ...alsoOpened);
-  await kv().del(`sale:${no}`, `sponsor:${no}`, `owner:${no}`);
-  await kv().hdel("sponsors:public", no);
+  await kv().srem(soldKey(board), no, ...alsoOpened);
+  await kv().del(saleKey(board, no), sponsorKey(board, no), ownerKey(board, no));
+  await kv().hdel(publicSponsorsKey(board), no);
 }
 
 export type SaleRecord = {
@@ -108,9 +119,9 @@ export type SaleRecord = {
 
 /** The receipt for a position: who bought it, what they gave you, and
  *  whether it came from Stripe or was marked by hand. */
-export async function getSale(no: string): Promise<SaleRecord | null> {
+export async function getSale(no: string, board = ""): Promise<SaleRecord | null> {
   if (!kvConfigured()) return null;
-  const raw = await kv().hgetall<Record<string, unknown>>(`sale:${no}`);
+  const raw = await kv().hgetall<Record<string, unknown>>(saleKey(board, no));
   if (!raw) return null;
   const str = (v: unknown) => (v === null || v === undefined ? "" : String(v));
   return {
@@ -142,11 +153,13 @@ export type UnmatchedPayment = {
   currency: string;
   at: string;
   reason: string;
+  board: string;
 };
 
 export async function recordUnmatched(
   session: Stripe.Checkout.Session,
   reason: string,
+  board = "",
 ): Promise<void> {
   if (!kvConfigured()) return;
   const fields = session.custom_fields ?? [];
@@ -162,6 +175,7 @@ export async function recordUnmatched(
     currency: session.currency ?? "usd",
     at: new Date().toISOString(),
     reason,
+    board,
   };
   await kv().hset(UNMATCHED_KEY, { [session.id]: JSON.stringify(record) });
 }

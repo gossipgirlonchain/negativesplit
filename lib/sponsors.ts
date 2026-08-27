@@ -1,5 +1,6 @@
 import { kv, kvConfigured } from "./kv";
 import { POSITIONS, TAKE_ALL } from "./positions";
+import { ownerKey, publicSponsorsKey, saleKey, sponsorKey } from "./boards";
 
 /* ============================================================
    SPONSOR ARTWORK
@@ -35,9 +36,6 @@ export type SponsorRecord = PublicSponsor & {
   note: string;
 };
 
-const PUBLIC_KEY = "sponsors:public";
-const recordKey = (no: string) => `sponsor:${no}`;
-const overrideKey = (no: string) => `owner:${no}`;
 
 /** Everything out of KV comes back deserialized, so "11" can arrive as 11.
  *  Force strings on the way in. */
@@ -46,9 +44,11 @@ const str = (v: unknown): string => (v === null || v === undefined ? "" : String
 /* ---------- public ---------- */
 
 /** Approved artwork only, keyed by position number. One KV read. */
-export async function getApprovedSponsors(): Promise<Record<string, PublicSponsor>> {
+export async function getApprovedSponsors(
+  board = "",
+): Promise<Record<string, PublicSponsor>> {
   if (!kvConfigured()) return {};
-  const raw = await kv().hgetall<Record<string, unknown>>(PUBLIC_KEY);
+  const raw = await kv().hgetall<Record<string, unknown>>(publicSponsorsKey(board));
   if (!raw) return {};
 
   const out: Record<string, PublicSponsor> = {};
@@ -78,9 +78,12 @@ function safeParse(value: string): unknown {
 
 /* ---------- records ---------- */
 
-export async function getSponsorRecord(no: string): Promise<SponsorRecord | null> {
+export async function getSponsorRecord(
+  no: string,
+  board = "",
+): Promise<SponsorRecord | null> {
   if (!kvConfigured()) return null;
-  const raw = await kv().hgetall<Record<string, unknown>>(recordKey(no));
+  const raw = await kv().hgetall<Record<string, unknown>>(sponsorKey(board, no));
   if (!raw || !raw.logoUrl) return null;
   const status = str(raw.status);
   return {
@@ -99,10 +102,12 @@ export async function getSponsorRecord(no: string): Promise<SponsorRecord | null
 }
 
 /** Every submission, newest work first. Admin view. */
-export async function getAllSponsorRecords(): Promise<SponsorRecord[]> {
+export async function getAllSponsorRecords(board = ""): Promise<SponsorRecord[]> {
   if (!kvConfigured()) return [];
   const numbers = [...POSITIONS.map((p) => p.no), TAKE_ALL.no];
-  const records = await Promise.all(numbers.map((no) => getSponsorRecord(no)));
+  const records = await Promise.all(
+    numbers.map((no) => getSponsorRecord(no, board)),
+  );
   const found = records.filter((r): r is SponsorRecord => r !== null);
   const rank = { pending: 0, approved: 1, rejected: 2 };
   return found.sort(
@@ -113,14 +118,17 @@ export async function getAllSponsorRecords(): Promise<SponsorRecord[]> {
 
 /** Save a submission. Always lands as pending: nothing reaches the public
  *  page without a human saying yes. */
-export async function submitArtwork(input: {
-  no: string;
-  brand: string;
-  url: string;
-  logoUrl: string;
-  logoPath: string;
-}): Promise<void> {
-  await kv().hset(recordKey(input.no), {
+export async function submitArtwork(
+  input: {
+    no: string;
+    brand: string;
+    url: string;
+    logoUrl: string;
+    logoPath: string;
+  },
+  board = "",
+): Promise<void> {
+  await kv().hset(sponsorKey(board, input.no), {
     brand: input.brand,
     url: input.url,
     logoUrl: input.logoUrl,
@@ -131,19 +139,20 @@ export async function submitArtwork(input: {
     note: "",
   });
   // a resubmission pulls the old artwork off the public page immediately
-  await kv().hdel(PUBLIC_KEY, input.no);
+  await kv().hdel(publicSponsorsKey(board), input.no);
 }
 
 export async function reviewArtwork(
   no: string,
   decision: "approve" | "reject",
   note = "",
+  board = "",
 ): Promise<SponsorRecord | null> {
-  const record = await getSponsorRecord(no);
+  const record = await getSponsorRecord(no, board);
   if (!record) return null;
 
   const status: SponsorStatus = decision === "approve" ? "approved" : "rejected";
-  await kv().hset(recordKey(no), {
+  await kv().hset(sponsorKey(board, no), {
     status,
     reviewedAt: new Date().toISOString(),
     note,
@@ -156,9 +165,9 @@ export async function reviewArtwork(
       url: record.url,
       logoUrl: record.logoUrl,
     };
-    await kv().hset(PUBLIC_KEY, { [no]: JSON.stringify(publicRecord) });
+    await kv().hset(publicSponsorsKey(board), { [no]: JSON.stringify(publicRecord) });
   } else {
-    await kv().hdel(PUBLIC_KEY, no);
+    await kv().hdel(publicSponsorsKey(board), no);
   }
 
   return { ...record, status, note };
@@ -168,17 +177,21 @@ export async function reviewArtwork(
 
 /** Who owns a position: the manual override if one is set, otherwise the
  *  email that paid for it. */
-export async function getOwnerEmail(no: string): Promise<string> {
+export async function getOwnerEmail(no: string, board = ""): Promise<string> {
   if (!kvConfigured()) return "";
-  const override = await kv().get<string>(overrideKey(no));
+  const override = await kv().get<string>(ownerKey(board, no));
   if (override) return str(override).toLowerCase();
-  const sale = await kv().hgetall<Record<string, unknown>>(`sale:${no}`);
+  const sale = await kv().hgetall<Record<string, unknown>>(saleKey(board, no));
   return str(sale?.email).toLowerCase();
 }
 
 /** Bind a position to a different email than the one that paid. */
-export async function setOwnerEmail(no: string, email: string): Promise<void> {
-  await kv().set(overrideKey(no), email.trim().toLowerCase());
+export async function setOwnerEmail(
+  no: string,
+  email: string,
+  board = "",
+): Promise<void> {
+  await kv().set(ownerKey(board, no), email.trim().toLowerCase());
 }
 
 /* ---------- publishing a name without artwork ----------
@@ -190,8 +203,9 @@ export async function publishBrand(
   no: string,
   brand: string,
   url = "",
+  board = "",
 ): Promise<void> {
-  const existing = await getSponsorRecord(no);
+  const existing = await getSponsorRecord(no, board);
   const entry: PublicSponsor = {
     no,
     brand: brand.trim(),
@@ -200,10 +214,10 @@ export async function publishBrand(
       ? { logoUrl: existing.logoUrl }
       : {}),
   };
-  await kv().hset(PUBLIC_KEY, { [no]: JSON.stringify(entry) });
+  await kv().hset(publicSponsorsKey(board), { [no]: JSON.stringify(entry) });
 }
 
 /** Take a name back off the board. */
-export async function hideBrand(no: string): Promise<void> {
-  await kv().hdel(PUBLIC_KEY, no);
+export async function hideBrand(no: string, board = ""): Promise<void> {
+  await kv().hdel(publicSponsorsKey(board), no);
 }

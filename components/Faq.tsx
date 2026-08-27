@@ -1,7 +1,8 @@
+import type { Board } from "@/lib/boards";
 import { CHEAPEST } from "@/lib/positions";
 import { money } from "@/lib/money";
 
-export default function Faq() {
+export default function Faq({ board }: { board: Board }) {
   return (
     <section id="faq" style={{ background: "var(--bg2)" }}>
       <div className="narrow">
@@ -88,10 +89,12 @@ export default function Faq() {
           <div className="ans">
             <p>
               No gambling, no adult sites, no MLM, no supplements making medical claims,
-              and nothing with a token I would have to write a disclaimer for. I
-              have been in crypto for eight years, so crypto itself is fine. The
-              test is simple: if I would not post it from my own account, it does
-              not go on my body or my bike.
+              and nothing with a token I would have to write a disclaimer for.
+              {board.personalCryptoLine
+                ? " I have been in crypto for eight years, so crypto itself is fine."
+                : " Crypto itself is fine."}{" "}
+              The test is simple: if I would not post it from my own account, it
+              does not go on my body or my bike.
             </p>
             <p>
               I reserve the right to refuse and refund anything, and I will tell

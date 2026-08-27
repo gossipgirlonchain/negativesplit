@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { viewerFrom } from "@/lib/auth";
 import { BY_NO, TAKE_ALL } from "@/lib/positions";
+import { boardBySlug } from "@/lib/boards";
 import {
   clearUnmatched,
   getSale,
@@ -28,15 +29,17 @@ export async function POST(req: Request) {
     brand?: string;
     url?: string;
     session?: string;
+    board?: string;
   };
 
+  const board = boardBySlug(body.board);
   const no = String(body.position ?? "").trim();
   if (!BY_NO[no] && no !== TAKE_ALL.no) {
     return Response.json({ error: "unknown position" }, { status: 400 });
   }
 
   if (body.action === "publish-name") {
-    const sale = await getSale(no);
+    const sale = await getSale(no, board.slug);
     const brand = String(body.brand ?? sale?.brand ?? "").trim();
     if (!brand) {
       return Response.json(
@@ -44,31 +47,31 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    await publishBrand(no, brand, String(body.url ?? "").trim());
-    revalidatePath("/");
+    await publishBrand(no, brand, String(body.url ?? "").trim(), board.slug);
+    revalidatePath(board.path);
     return Response.json({ ok: true, position: no, brand });
   }
 
   if (body.action === "hide-name") {
-    await hideBrand(no);
-    revalidatePath("/");
+    await hideBrand(no, board.slug);
+    revalidatePath(board.path);
     return Response.json({ ok: true, position: no, state: "hidden" });
   }
 
   if (body.action === "release") {
-    await releasePosition(no);
-    revalidatePath("/");
+    await releasePosition(no, board.slug);
+    revalidatePath(board.path);
     return Response.json({ ok: true, position: no, state: "available" });
   }
 
   const email = String(body.email ?? viewer.email).trim().toLowerCase();
   if (!email) return Response.json({ error: "an owner email is required" }, { status: 400 });
 
-  await setSoldManually(no, email);
+  await setSoldManually(no, email, board.slug);
 
   // attaching a stray Stripe payment to a position clears it from the list
   if (body.session) await clearUnmatched(String(body.session));
 
-  revalidatePath("/");
+  revalidatePath(board.path);
   return Response.json({ ok: true, position: no, state: "sold", owner: email });
 }

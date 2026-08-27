@@ -5,9 +5,10 @@
    statically rendered, and clears it from the URL afterwards. */
 
 import { useEffect, useState } from "react";
-import { BY_NO, CONTACT_EMAIL, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import type { Board } from "@/lib/boards";
+import { BY_NO, TAKE_ALL, TOTAL_N } from "@/lib/positions";
 
-export default function ThanksBanner() {
+export default function ThanksBanner({ board }: { board: Board }) {
   const [claimed, setClaimed] = useState<string | null>(null);
   const [taken, setTaken] = useState<string | null>(null);
 
@@ -51,16 +52,16 @@ export default function ThanksBanner() {
   if (!claimed) return null;
 
   const position = BY_NO[claimed];
-  const send = (
+  const mail = (
+    <a href={`mailto:${board.contactEmail}`} style={{ color: "var(--accent)" }}>
+      {board.contactEmail}
+    </a>
+  );
+  const send = board.uploads ? (
     <a href="/sponsor" style={{ color: "var(--accent)" }}>
       send your artwork
     </a>
-  );
-  const mail = (
-    <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "var(--accent)" }}>
-      {CONTACT_EMAIL}
-    </a>
-  );
+  ) : null;
 
   return (
     <div className="thanks show">
@@ -70,19 +71,18 @@ export default function ThanksBanner() {
           <b>
             No. {position.no}, {position.name}
           </b>{" "}
-          is yours. Sign in with this email to {send}, an SVG or a 300dpi PNG,
-          or just email it to {mail}. Either way you get a proof back.
+          is yours. {send ? <>Sign in with this email to {send}, or email </> : <>Email </>}
+          your artwork to {mail} as an SVG or a 300dpi PNG, and you get a proof
+          back.
         </>
       ) : claimed === TAKE_ALL.no ? (
         <>
-          Thank you. <b>All {TOTAL_N} positions</b> are yours. Sign in with this
-          email to {send}, an SVG or a 300dpi PNG, or just email it to {mail}.
-          Either way you get a proof back.
+          Thank you. <b>All {TOTAL_N} positions</b> are yours. Email your artwork
+          to {mail} as an SVG or a 300dpi PNG and you get a proof back.
         </>
       ) : (
         <>
-          Thank you. Sign in with this email to {send}, or email it to {mail},
-          and I will send a proof back.
+          Thank you. Email your artwork to {mail} and I will send a proof back.
         </>
       )}
     </div>

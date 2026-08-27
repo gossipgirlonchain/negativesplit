@@ -232,8 +232,9 @@ export const BY_TARGET: Record<string, Position> = Object.fromEntries(
  * for this position on the spot and redirects to it, so there is nothing
  * to create in Stripe ahead of time and no list of URLs to maintain.
  */
-export function buyHref(no: string): string {
-  return `/api/checkout/${encodeURIComponent(no)}`;
+export function buyHref(no: string, board = ""): string {
+  const path = `/api/checkout/${encodeURIComponent(no)}`;
+  return board ? `${path}?b=${encodeURIComponent(board)}` : path;
 }
 
 /** Committed dollars, given what KV says has sold. */

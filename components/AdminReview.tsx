@@ -3,6 +3,7 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useCallback, useEffect, useState } from "react";
 import { BY_NO } from "@/lib/positions";
+import { BOARDS } from "@/lib/boards";
 
 type Unmatched = {
   session: string;
@@ -51,12 +52,13 @@ export default function AdminReview() {
   const [unmatched, setUnmatched] = useState<Unmatched[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
+  const [slug, setSlug] = useState("");
 
   const load = useCallback(async () => {
     setError("");
     const token = await getAccessToken();
     if (!token) return;
-    const res = await fetch("/api/admin/submissions", {
+    const res = await fetch(`/api/admin/submissions?board=${slug}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });
@@ -77,7 +79,7 @@ export default function AdminReview() {
     setRecords(data.records);
     setBoard(data.board ?? []);
     setUnmatched(data.unmatched ?? []);
-  }, [getAccessToken]);
+  }, [getAccessToken, slug]);
 
   useEffect(() => {
     if (authenticated) void load();
@@ -119,6 +121,7 @@ export default function AdminReview() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        board: slug,
         position: no.trim(),
         action: "sell",
         email: payment.email,
@@ -163,6 +166,7 @@ export default function AdminReview() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          board: slug,
           position: entry.no,
           action: "publish-name",
           brand,
@@ -220,7 +224,7 @@ export default function AdminReview() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ position: no, decision, note }),
+      body: JSON.stringify({ position: no, decision, note, board: slug }),
     });
     setBusy("");
     await load();
@@ -237,7 +241,7 @@ export default function AdminReview() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ position: no, owner }),
+      body: JSON.stringify({ position: no, owner, board: slug }),
     });
     setBusy("");
     await load();

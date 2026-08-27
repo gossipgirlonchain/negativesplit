@@ -9,14 +9,17 @@ import Reveal from "./Reveal";
 import { hoverHandlers, useHover } from "./HoverSync";
 import { GROUPS, buyHref, type Position } from "@/lib/positions";
 import type { PublicSponsor } from "@/lib/sponsors";
+import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
 
 export default function PositionList({
   sold,
   sponsors,
+  board,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  board: Board;
 }) {
   const soldSet = new Set(sold);
   const { active, setActive } = useHover();
@@ -40,7 +43,7 @@ export default function PositionList({
                 position={position}
                 isSold={soldSet.has(position.no)}
                 sponsor={sponsors[position.no]}
-                href={buyHref(position.no)}
+                href={buyHref(position.no, board.slug)}
                 isActive={active === position.target}
                 setActive={setActive}
               />

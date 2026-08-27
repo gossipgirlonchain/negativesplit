@@ -3,6 +3,7 @@ import AdminReview from "@/components/AdminReview";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import PrivyClientProvider from "@/components/PrivyClientProvider";
+import { MAIN } from "@/lib/boards";
 
 export const metadata: Metadata = {
   title: "Review artwork",
@@ -14,7 +15,7 @@ export default function AdminPage() {
 
   return (
     <>
-      <Nav />
+      <Nav board={MAIN} />
       <main id="top">
         <section className="tight">
           <div className="narrow">
@@ -35,7 +36,7 @@ export default function AdminPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer board={MAIN} />
     </>
   );
 }

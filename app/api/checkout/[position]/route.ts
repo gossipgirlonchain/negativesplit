@@ -1,5 +1,6 @@
 import Stripe from "stripe";
-import { BY_NO, CONTACT_EMAIL, SITE_NAME, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { BY_NO, SITE_NAME, TAKE_ALL, TOTAL_N } from "@/lib/positions";
+import { boardBySlug } from "@/lib/boards";
 import { resolveSiteUrl } from "@/lib/site";
 import { getSold } from "@/lib/sold";
 
@@ -20,11 +21,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ position: string }> },
 ) {
   const { position } = await params;
+  const board = boardBySlug(new URL(req.url).searchParams.get("b"));
   const site = resolveSiteUrl();
+  const back = `${site}${board.path === "/" ? "" : board.path}`;
 
   const item =
     position === TAKE_ALL.no
@@ -43,16 +46,21 @@ export async function GET(
           }
         : null;
 
-  if (!item) return Response.redirect(`${site}/#positions`, 303);
+  if (!item) return Response.redirect(`${back}/#positions`, 303);
 
   // already gone: send them back to the board rather than take their money
-  const sold = await getSold();
+  const sold = await getSold(board.slug);
   if (sold.has(item.no) || sold.has(TAKE_ALL.no)) {
-    return Response.redirect(`${site}/?taken=${item.no}#positions`, 303);
+    return Response.redirect(`${back}/?taken=${item.no}#positions`, 303);
   }
 
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return Response.redirect(emailFallback(item.no, item.name), 303);
+  if (!key) {
+    return Response.redirect(
+      emailFallback(item.no, item.name, board.contactEmail),
+      303,
+    );
+  }
 
   try {
     const stripe = new Stripe(key);
@@ -72,7 +80,8 @@ export async function GET(
         },
       ],
       // the webhook reads this to know what was bought
-      metadata: { position: item.no },
+      // the webhook reads both: what was bought, and whose board
+      metadata: { position: item.no, board: board.slug },
       // what the buyer has to give you so you can chase artwork
       custom_fields: [
         { key: "brand", label: { type: "custom", custom: "Brand name" }, type: "text" },
@@ -82,21 +91,24 @@ export async function GET(
           type: "text",
         },
       ],
-      success_url: `${site}/?claimed=${item.no}`,
-      cancel_url: `${site}/#positions`,
+      success_url: `${back}/?claimed=${item.no}`,
+      cancel_url: `${back}/#positions`,
     });
 
     if (!session.url) throw new Error("Stripe returned a session with no URL");
     return Response.redirect(session.url, 303);
   } catch (err) {
     console.error(`[checkout] could not start checkout for ${item.no}:`, err);
-    return Response.redirect(emailFallback(item.no, item.name), 303);
+    return Response.redirect(
+      emailFallback(item.no, item.name, board.contactEmail),
+      303,
+    );
   }
 }
 
 /** Last resort only. A buyer should never see this unless Stripe is down. */
-function emailFallback(no: string, label: string): string {
+function emailFallback(no: string, label: string, to: string): string {
   const subject = `${SITE_NAME} - claiming No. ${no} (${label})`;
   const body = `Hi Winny,\n\nI want No. ${no} - ${label}.\n\nBrand:\nArtwork format:\n\n`;
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

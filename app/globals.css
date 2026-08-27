@@ -461,3 +461,12 @@ footer { border-top:1px solid var(--line2); padding:46px 0 70px; }
   flex-basis:100%; display:flex; align-items:center; gap:10px;
   flex-wrap:wrap; padding:2px 0 6px;
 }
+
+/* ---------- a board's own accent ----------
+   Connor's board is green where the original is pink. Only the accent
+   tokens change, so every rule that uses them follows automatically. */
+[data-board="connor"] {
+  --accent:#0B8A47;
+  --accent-soft:rgba(11,138,71,.10);
+  --accent-line:rgba(11,138,71,.45);
+}

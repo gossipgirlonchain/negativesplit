@@ -1,10 +1,11 @@
+import type { Board } from "@/lib/boards";
 import { SITE_NAME } from "@/lib/positions";
 
-export default function Nav() {
+export default function Nav({ board }: { board: Board }) {
   return (
     <header className="nav">
       <div className="wrap nav-in">
-        <a className="mark" href="#top">
+        <a className="mark" href={`${board.path}#top`}>
           <span className="dot" />
           <span>{SITE_NAME}</span>
         </a>

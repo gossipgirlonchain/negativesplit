@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
 import { BY_TARGET, TOTAL_N, buyHref } from "@/lib/positions";
 import type { PublicSponsor } from "@/lib/sponsors";
+import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
 import { hoverHandlers, useHover } from "./HoverSync";
 
@@ -29,9 +30,11 @@ import { ZONES, ZONE_ORDER } from "./zones";
 export default function Drawing({
   sold,
   sponsors,
+  board,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  board: Board;
 }) {
   const soldSet = useMemo(() => new Set(sold), [sold]);
   const { active, setActive } = useHover();
@@ -136,7 +139,7 @@ export default function Drawing({
         window.open(sponsor.url, "_blank", "noopener,noreferrer");
         return;
       }
-      if (!isSold) window.location.href = buyHref(p.no);
+      if (!isSold) window.location.href = buyHref(p.no, board.slug);
     };
     return {
       id: target,

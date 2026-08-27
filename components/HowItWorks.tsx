@@ -1,7 +1,7 @@
 import Reveal from "./Reveal";
-import { CONTACT_EMAIL } from "@/lib/positions";
+import type { Board } from "@/lib/boards";
 
-const STEPS = [
+const steps = (board: Board) => [
   {
     n: "STEP 01",
     title: "Pick a position, pay",
@@ -10,7 +10,7 @@ const STEPS = [
   {
     n: "STEP 02",
     title: "Send artwork",
-    body: `Upload it after checkout, or email it to ${CONTACT_EMAIL}. Vector SVG or AI preferred, PNG at 300dpi accepted. Kit panels go to the printer as one file, so those close October 24. Frame positions I cut on outdoor vinyl and proof by photo before anything is applied.`,
+    body: `${board.uploads ? `Upload it after checkout, or email it to ${board.contactEmail}` : `Email it to ${board.contactEmail} after checkout`}. Vector SVG or AI preferred, PNG at 300dpi accepted. Kit panels go to the printer as one file, so those close October 24. Frame positions I cut on outdoor vinyl and proof by photo before anything is applied.`,
   },
   {
     n: "STEP 03",
@@ -19,7 +19,7 @@ const STEPS = [
   },
 ];
 
-export default function HowItWorks() {
+export default function HowItWorks({ board }: { board: Board }) {
   return (
     <section id="how" style={{ background: "var(--bg2)" }}>
       <div className="wrap">
@@ -28,7 +28,7 @@ export default function HowItWorks() {
           <p>Three steps. No calls, no deck, no invoice.</p>
         </div>
         <div className="trio">
-          {STEPS.map((step, i) => (
+          {steps(board).map((step, i) => (
             <Reveal key={step.n} className="card" delay={i * 70}>
               <span className="step-n">{step.n}</span>
               <h3>{step.title}</h3>

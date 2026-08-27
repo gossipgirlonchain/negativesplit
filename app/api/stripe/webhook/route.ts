@@ -64,15 +64,16 @@ export async function POST(req: Request) {
   // Set by /api/checkout. A payment that arrives without it came from
   // somewhere else: a manual link, an invoice, an old link. Money has
   // changed hands, so record it for /admin rather than dropping it.
+  const board = session.metadata?.board ?? "";
   const position = session.metadata?.position;
   if (!position) {
     console.warn(`[webhook] session ${session.id} has no metadata.position`);
-    await recordUnmatched(session, "no position on the payment");
+    await recordUnmatched(session, "no position on the payment", board);
     return new Response("recorded as unmatched", { status: 200 });
   }
 
   try {
-    await markSold(position, session);
+    await markSold(position, session, board);
   } catch (err) {
     // 500 so Stripe retries. A position that stays available after
     // someone paid for it is the one bug worth a retry storm.
@@ -80,6 +81,8 @@ export async function POST(req: Request) {
     return new Response("could not write sold state", { status: 500 });
   }
 
-  console.log(`[webhook] ${position} sold — session ${session.id}`);
+  console.log(
+    `[webhook] ${position} sold on board "${board || "main"}" — session ${session.id}`,
+  );
   return new Response("ok", { status: 200 });
 }

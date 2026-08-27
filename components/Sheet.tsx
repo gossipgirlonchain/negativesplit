@@ -2,13 +2,16 @@ import Drawing from "./Drawing";
 import Reveal from "./Reveal";
 import { TOTAL_N } from "@/lib/positions";
 import type { PublicSponsor } from "@/lib/sponsors";
+import type { Board } from "@/lib/boards";
 
 export default function Sheet({
   sold,
   sponsors,
+  board,
 }: {
   sold: string[];
   sponsors: Record<string, PublicSponsor>;
+  board: Board;
 }) {
   return (
     <Reveal className="sheet">
@@ -35,7 +38,7 @@ export default function Sheet({
         </div>
       </div>
       <div className="hero-scroll">
-        <Drawing sold={sold} sponsors={sponsors} />
+        <Drawing sold={sold} sponsors={sponsors} board={board} />
       </div>
     </Reveal>
   );
