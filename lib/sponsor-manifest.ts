@@ -71,7 +71,11 @@ const MANIFEST: Record<string, ManifestEntry> = {
     url: "https://wawand.co",
     logo: "/sponsors/wawandco.svg",
   },
-  "14": { brand: "SymbolSecurity", url: "https://symbolsecurity.com" },
+  "14": {
+    brand: "SymbolSecurity",
+    url: "https://symbolsecurity.com",
+    logo: "/sponsors/symbolsecurity.svg",
+  },
   "15": {
     brand: "Wawandco",
     url: "https://wawand.co",

@@ -44,6 +44,8 @@ export default function Drawing({
   const bgRef = useRef<SVGRectElement>(null);
   const txtRef = useRef<SVGTextElement>(null);
   const imgRef = useRef<SVGImageElement>(null);
+  const plateRef = useRef<SVGRectElement>(null);
+  const urlRef = useRef<SVGTextElement>(null);
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -51,7 +53,9 @@ export default function Drawing({
     const bg = bgRef.current;
     const txt = txtRef.current;
     const img = imgRef.current;
-    if (!svg || !callout || !bg || !txt || !img) return;
+    const plate = plateRef.current;
+    const url = urlRef.current;
+    if (!svg || !callout || !bg || !txt || !img || !plate || !url) return;
 
     const p = active ? BY_TARGET[active] : undefined;
     const g = active
@@ -67,35 +71,70 @@ export default function Drawing({
     let width: number;
     let height: number;
 
-    if (sponsor?.logoUrl) {
-      // a sponsored position shows the mark big enough to actually read,
-      // with the brand under it. Clicking goes to their site.
-      const brand = sponsor.brand.toUpperCase();
-      width = Math.max(154, brand.length * 7.6 + 36);
-      height = 74;
+    if (sponsor) {
+      // A sponsor gets a card: the mark at a size you can actually read,
+      // the brand under it, and the site it goes to. The logo sits on a
+      // white plate because half these marks are dark and the card is not.
+      const PAD = 14;
+      const LOGO_H = 58;
+      const PLATE_H = LOGO_H + 16;
+      const brand = sponsor.brand;
+      const site = sponsor.url
+        ? sponsor.url.replace(/^https?:\/\//i, "").replace(/\/$/, "")
+        : "";
+
+      width = Math.min(
+        320,
+        Math.max(200, brand.length * 8.4 + PAD * 2, site.length * 6.6 + PAD * 2),
+      );
+
+      const plateY = PAD;
+      const brandY = plateY + PLATE_H + 24;
+      const siteY = brandY + 18;
+      height = (site ? siteY : brandY) + PAD + 4;
 
       bg.setAttribute("width", String(width));
       bg.setAttribute("height", String(height));
-      bg.setAttribute("rx", "10");
+      bg.setAttribute("rx", "12");
 
-      img.setAttribute("href", sponsor.logoUrl);
-      img.setAttribute("x", "14");
-      img.setAttribute("y", "13");
-      img.setAttribute("width", String(width - 28));
-      img.setAttribute("height", "32");
-      img.style.display = "";
+      plate.setAttribute("x", String(PAD));
+      plate.setAttribute("y", String(plateY));
+      plate.setAttribute("width", String(width - PAD * 2));
+      plate.setAttribute("height", String(PLATE_H));
+      plate.style.display = "";
+
+      img.setAttribute("href", sponsor.logoUrl ?? "");
+      img.setAttribute("x", String(PAD + 10));
+      img.setAttribute("y", String(plateY + 8));
+      img.setAttribute("width", String(width - PAD * 2 - 20));
+      img.setAttribute("height", String(LOGO_H));
+      img.style.display = sponsor.logoUrl ? "" : "none";
+      if (!sponsor.logoUrl) plate.style.display = "none";
 
       txt.textContent = brand;
       txt.setAttribute("x", String(width / 2));
-      txt.setAttribute("y", "61");
+      txt.setAttribute("y", String(sponsor.logoUrl ? brandY : plateY + 22));
       txt.setAttribute("text-anchor", "middle");
-      txt.setAttribute("font-size", "11");
-      txt.setAttribute("letter-spacing", "1.3");
+      txt.setAttribute("font-size", "15");
+      txt.setAttribute("letter-spacing", "0");
+
+      if (site) {
+        url.textContent = site;
+        url.setAttribute("x", String(width / 2));
+        url.setAttribute(
+          "y",
+          String(sponsor.logoUrl ? siteY : plateY + 40),
+        );
+        url.style.display = "";
+        if (!sponsor.logoUrl) height = plateY + 40 + PAD + 4;
+      } else {
+        url.style.display = "none";
+        if (!sponsor.logoUrl) height = plateY + 22 + PAD + 6;
+      }
+      bg.setAttribute("height", String(height));
     } else {
-      // a sponsor with no artwork yet still reads as their name
-      const label = sponsor
-        ? `${p.name}  ·  ${sponsor.brand}`
-        : p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
+      const label =
+        p.name + "  ·  " + (soldSet.has(p.no) ? "Sold" : money(p.price));
       width = label.length * 6.6 + 26;
       height = 30;
 
@@ -104,6 +143,8 @@ export default function Drawing({
       bg.setAttribute("rx", "15");
 
       img.style.display = "none";
+      plate.style.display = "none";
+      url.style.display = "none";
 
       txt.textContent = label;
       txt.setAttribute("x", "15");
@@ -336,6 +377,13 @@ export default function Drawing({
 
       <g className="callout" ref={calloutRef} style={{ opacity: 0 }}>
         <rect ref={bgRef} className="cbg" x="0" y="0" width="200" height="30" rx="15" fill="var(--text)" />
+        <rect
+          ref={plateRef}
+          className="cplate"
+          rx="7"
+          fill="#ffffff"
+          style={{ display: "none" }}
+        />
         <image
           ref={imgRef}
           className="clogo"
@@ -350,6 +398,17 @@ export default function Drawing({
           fill="var(--bg)"
           fontSize="14"
           fontWeight="500"
+        >
+          .
+        </text>
+        <text
+          ref={urlRef}
+          className="curl"
+          x="0"
+          y="0"
+          textAnchor="middle"
+          fontSize="12"
+          style={{ display: "none" }}
         >
           .
         </text>
