@@ -26,7 +26,16 @@ export type PublicSponsor = {
   /** Absent until artwork is approved. A brand can go on the board by
    *  name first, and gain its logo later. */
   logoUrl?: string;
+  /** X handle without the @. */
+  x?: string;
 };
+
+/** Where a sponsor's name should lead: their site if they have one,
+ *  otherwise their X. */
+export function sponsorLink(sponsor: PublicSponsor): string {
+  if (sponsor.url) return sponsor.url;
+  return sponsor.x ? `https://x.com/${sponsor.x}` : "";
+}
 
 /** The full record, admin side. */
 export type SponsorRecord = PublicSponsor & {
@@ -62,11 +71,13 @@ export async function getApprovedSponsors(
     const s = parsed as Partial<PublicSponsor>;
     if (!s.brand) continue;
     const logoUrl = str(s.logoUrl);
+    const handle = str((s as { x?: string }).x);
     out[str(no)] = {
       no: str(no),
       brand: str(s.brand),
       url: str(s.url),
       ...(logoUrl ? { logoUrl } : {}),
+      ...(handle ? { x: handle } : {}),
     };
   }
   return out;

@@ -8,6 +8,7 @@
 
 import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
 import { BY_TARGET, TOTAL_N, buyHref } from "@/lib/positions";
+import { sponsorLink } from "@/lib/sponsors";
 import type { PublicSponsor } from "@/lib/sponsors";
 import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
@@ -79,9 +80,12 @@ export default function Drawing({
       const LOGO_H = 58;
       const PLATE_H = LOGO_H + 16;
       const brand = sponsor.brand;
-      const site = sponsor.url
-        ? sponsor.url.replace(/^https?:\/\//i, "").replace(/\/$/, "")
-        : "";
+      const site = [
+        sponsor.url ? sponsor.url.replace(/^https?:\/\//i, "").replace(/\/$/, "") : "",
+        sponsor.x ? `@${sponsor.x}` : "",
+      ]
+        .filter(Boolean)
+        .join("  ·  ");
 
       width = Math.min(
         320,
@@ -176,8 +180,9 @@ export default function Drawing({
     const isSold = soldSet.has(p.no);
     const sponsor = sponsors[p.no];
     const go = () => {
-      if (sponsor?.url) {
-        window.open(sponsor.url, "_blank", "noopener,noreferrer");
+      const link = sponsor ? sponsorLink(sponsor) : "";
+      if (link) {
+        window.open(link, "_blank", "noopener,noreferrer");
         return;
       }
       if (!isSold) window.location.href = buyHref(p.no, board.slug);

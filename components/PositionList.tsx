@@ -8,7 +8,7 @@ import { Fragment } from "react";
 import Reveal from "./Reveal";
 import { hoverHandlers, useHover } from "./HoverSync";
 import { GROUPS, buyHref, type Position } from "@/lib/positions";
-import type { PublicSponsor } from "@/lib/sponsors";
+import { sponsorLink, type PublicSponsor } from "@/lib/sponsors";
 import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
 
@@ -80,8 +80,9 @@ function Row({
       {...hoverHandlers(position.target, setActive)}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("a")) return;
-        if (sponsor?.url) {
-          window.open(sponsor.url, "_blank", "noopener,noreferrer");
+        const link = sponsor ? sponsorLink(sponsor) : "";
+        if (link) {
+          window.open(link, "_blank", "noopener,noreferrer");
           return;
         }
         if (isSold) return;
@@ -102,7 +103,7 @@ function Row({
         {sponsor ? (
           <a
             className="sponsor"
-            href={sponsor.url || undefined}
+            href={sponsorLink(sponsor) || undefined}
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
@@ -116,10 +117,10 @@ function Row({
       </div>
       <div className="pr">{money(position.price)}</div>
       <div>
-        {sponsor?.url ? (
+        {sponsor && sponsorLink(sponsor) ? (
           <a
             className="btn sm quiet"
-            href={sponsor.url}
+            href={sponsorLink(sponsor)}
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
