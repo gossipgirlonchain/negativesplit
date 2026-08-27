@@ -87,7 +87,7 @@ export default function Faq() {
           <summary>Who can&rsquo;t buy?</summary>
           <div className="ans">
             <p>
-              No gambling, no adult, no MLM, no supplements making medical claims,
+              No gambling, no adult sites, no MLM, no supplements making medical claims,
               and nothing with a token I would have to write a disclaimer for. I
               have been in crypto for eight years, so crypto itself is fine. The
               test is simple: if I would not post it from my own account, it does
