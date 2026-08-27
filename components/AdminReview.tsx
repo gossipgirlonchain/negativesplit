@@ -105,6 +105,38 @@ export default function AdminReview() {
     }
   }
 
+  async function repairBoard() {
+    if (
+      !window.confirm(
+        "Put back on sale any position that has no payment or manual sale behind it? Real sales are untouched.",
+      )
+    ) {
+      return;
+    }
+    setBusy("repair");
+    const token = await getAccessToken();
+    const res = await fetch("/api/admin/position", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action: "repair", board: slug }),
+    });
+    const data = (await res.json()) as { removed?: string[]; error?: string };
+    setBusy("");
+    if (!res.ok) {
+      setError(data.error ?? "Repair failed.");
+      return;
+    }
+    setError(
+      data.removed?.length
+        ? `Put back on sale: ${data.removed.join(", ")}`
+        : "Nothing to repair. Every sold position has a sale behind it.",
+    );
+    await load();
+  }
+
   async function attachPayment(payment: Unmatched, preset?: string) {
     const no =
       preset ??
@@ -349,6 +381,13 @@ export default function AdminReview() {
               onClick={() => void testCheckout()}
             >
               $1 test checkout on No. 11
+            </button>
+            <button
+              className="btn sm quiet"
+              disabled={busy === "repair"}
+              onClick={() => void repairBoard()}
+            >
+              Repair sold list
             </button>
           </div>
           {board.map((entry) => (

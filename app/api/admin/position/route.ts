@@ -6,6 +6,7 @@ import {
   clearUnmatched,
   getSale,
   releasePosition,
+  repairSold,
   setSoldManually,
 } from "@/lib/sold";
 import { hideBrand, publishBrand } from "@/lib/sponsors";
@@ -33,6 +34,14 @@ export async function POST(req: Request) {
   };
 
   const board = boardBySlug(body.board);
+
+  // repair works on the whole board, so it runs before the position check
+  if (body.action === "repair") {
+    const removed = await repairSold(board.slug);
+    revalidatePath(board.path);
+    return Response.json({ ok: true, removed });
+  }
+
   const no = String(body.position ?? "").trim();
   if (!BY_NO[no] && no !== TAKE_ALL.no) {
     return Response.json({ error: "unknown position" }, { status: 400 });

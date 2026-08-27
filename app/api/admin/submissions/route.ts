@@ -1,5 +1,5 @@
 import { viewerFrom } from "@/lib/auth";
-import { POSITIONS, TAKE_ALL } from "@/lib/positions";
+import { POSITIONS } from "@/lib/positions";
 import { boardBySlug } from "@/lib/boards";
 import { getSale, getSold, listUnmatched } from "@/lib/sold";
 import { getAllSponsorRecords, getApprovedSponsors } from "@/lib/sponsors";
@@ -22,10 +22,10 @@ export async function GET(req: Request) {
     getApprovedSponsors(board.slug),
     listUnmatched(),
   ]);
-  const everyPosition = [
-    ...POSITIONS.map((p) => ({ no: p.no, name: p.name })),
-    { no: TAKE_ALL.no, name: "Every position, one brand" },
-  ];
+  // TAKE_ALL is deliberately absent. Marking it sold closes every position
+  // at once, and the whole-board offer is no longer sold on the site, so the
+  // row was a trap with no upside.
+  const everyPosition = POSITIONS.map((p) => ({ no: p.no, name: p.name }));
 
   const withState = await Promise.all(
     everyPosition.map(async (p) => ({

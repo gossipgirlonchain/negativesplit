@@ -203,3 +203,31 @@ function safeJson(value: string): unknown {
     return null;
   }
 }
+
+/**
+ * Remove anything from the sold list that has no sale behind it.
+ *
+ * Every real sale writes a sale record, whether it came from the webhook or
+ * from Mark sold. A position in the sold set with no such record was never
+ * bought: it got there as collateral, most often from marking the
+ * whole-board TITLE position, which closes all of them at once.
+ *
+ * Only the phantoms are removed. Buyers, brands and receipts are untouched.
+ */
+export async function repairSold(board = ""): Promise<string[]> {
+  if (!kvConfigured()) return [];
+
+  const sold = await getSold(board);
+  if (sold.size === 0) return [];
+
+  const phantoms: string[] = [];
+  for (const no of sold) {
+    const sale = await getSale(no, board);
+    if (!sale || !sale.at) phantoms.push(no);
+  }
+
+  if (phantoms.length) {
+    await kv().srem(soldKey(board), phantoms[0], ...phantoms.slice(1));
+  }
+  return phantoms;
+}
