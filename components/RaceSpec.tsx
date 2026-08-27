@@ -2,7 +2,7 @@ import Reveal from "./Reveal";
 
 const SPEC: { dt: string; dd: string; accent?: boolean }[] = [
   { dt: "Race", dd: "Ironman 70.3 Indian Wells / La Quinta" },
-  { dt: "Date", dd: "December 5, 2026" },
+  { dt: "Date", dd: "December 6, 2026" },
   { dt: "Distance", dd: "1.2 swim / 56 bike / 13.1 run" },
   { dt: "Then", dd: "Full Ironman, Q2 2027", accent: true },
   { dt: "Distance", dd: "2.4 swim / 112 bike / 26.2 run" },
