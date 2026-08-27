@@ -68,10 +68,11 @@ const MANIFEST: Record<string, ManifestEntry> = {
     x: "lo_tech",
     logo: "/sponsors/lotech.jpg",
   },
-  // UNCONFIRMED: built from their contact address, no site or handle given
   "08": {
     brand: "⚡️CMDK",
     url: "https://cmdk.email",
+    x: "cmdk_email",
+    logo: "/sponsors/cmdk.png",
   },
   "09": {
     brand: "Soup",
