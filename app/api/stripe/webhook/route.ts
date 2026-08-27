@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { markSold } from "@/lib/sold";
+import { markSold, recordUnmatched } from "@/lib/sold";
 
 /* ============================================================
    THE POINT OF THE MIGRATION
@@ -61,11 +61,14 @@ export async function POST(req: Request) {
     return new Response("not paid yet", { status: 200 });
   }
 
-  // scripts/stripe-setup.mjs puts this on every payment link
+  // Set by /api/checkout. A payment that arrives without it came from
+  // somewhere else: a manual link, an invoice, an old link. Money has
+  // changed hands, so record it for /admin rather than dropping it.
   const position = session.metadata?.position;
   if (!position) {
     console.warn(`[webhook] session ${session.id} has no metadata.position`);
-    return new Response("no position on session", { status: 200 });
+    await recordUnmatched(session, "no position on the payment");
+    return new Response("recorded as unmatched", { status: 200 });
   }
 
   try {

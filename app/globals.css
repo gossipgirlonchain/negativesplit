@@ -456,3 +456,8 @@ footer { border-top:1px solid var(--line2); padding:46px 0 70px; }
 .sale > div { display:flex; gap:14px; align-items:baseline; }
 .sale dt { font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--text3); min-width:74px; }
 .sale dd { margin:0; font-family:var(--mono); font-size:12px; word-break:break-all; }
+
+.candidates {
+  flex-basis:100%; display:flex; align-items:center; gap:10px;
+  flex-wrap:wrap; padding:2px 0 6px;
+}

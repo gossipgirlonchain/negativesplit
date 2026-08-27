@@ -125,3 +125,67 @@ export async function getSale(no: string): Promise<SaleRecord | null> {
     at: str(raw.at),
   };
 }
+
+/* ---------- payments that matched nothing ----------
+   A paid checkout with no position in its metadata used to be acknowledged
+   and forgotten, which means money in Stripe and nothing on the board. Keep
+   them so they surface in /admin instead of only in a log. */
+
+const UNMATCHED_KEY = "payments:unmatched";
+
+export type UnmatchedPayment = {
+  session: string;
+  email: string;
+  brand: string;
+  contact: string;
+  amount: number;
+  currency: string;
+  at: string;
+  reason: string;
+};
+
+export async function recordUnmatched(
+  session: Stripe.Checkout.Session,
+  reason: string,
+): Promise<void> {
+  if (!kvConfigured()) return;
+  const fields = session.custom_fields ?? [];
+  const field = (key: string) =>
+    fields.find((f) => f.key === key)?.text?.value ?? "";
+
+  const record: UnmatchedPayment = {
+    session: session.id,
+    email: session.customer_details?.email ?? "",
+    brand: field("brand"),
+    contact: field("contact"),
+    amount: session.amount_total ?? 0,
+    currency: session.currency ?? "usd",
+    at: new Date().toISOString(),
+    reason,
+  };
+  await kv().hset(UNMATCHED_KEY, { [session.id]: JSON.stringify(record) });
+}
+
+export async function listUnmatched(): Promise<UnmatchedPayment[]> {
+  if (!kvConfigured()) return [];
+  const raw = await kv().hgetall<Record<string, unknown>>(UNMATCHED_KEY);
+  if (!raw) return [];
+  const out: UnmatchedPayment[] = [];
+  for (const value of Object.values(raw)) {
+    const parsed = typeof value === "string" ? safeJson(value) : value;
+    if (parsed && typeof parsed === "object") out.push(parsed as UnmatchedPayment);
+  }
+  return out.sort((a, b) => b.at.localeCompare(a.at));
+}
+
+export async function clearUnmatched(sessionId: string): Promise<void> {
+  await kv().hdel(UNMATCHED_KEY, sessionId);
+}
+
+function safeJson(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}

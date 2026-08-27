@@ -4,6 +4,18 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useCallback, useEffect, useState } from "react";
 import { BY_NO } from "@/lib/positions";
 
+type Unmatched = {
+  session: string;
+  email: string;
+  brand: string;
+  contact: string;
+  amount: number;
+  currency: string;
+  at: string;
+  reason: string;
+  candidates: { no: string; name: string }[];
+};
+
 type Sale = {
   email: string;
   brand: string;
@@ -36,6 +48,7 @@ export default function AdminReview() {
   const { ready, authenticated, login, logout, getAccessToken } = usePrivy();
   const [records, setRecords] = useState<Record_[] | null>(null);
   const [board, setBoard] = useState<BoardEntry[]>([]);
+  const [unmatched, setUnmatched] = useState<Unmatched[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
 
@@ -56,9 +69,14 @@ export default function AdminReview() {
       setError("Could not load submissions.");
       return;
     }
-    const data = (await res.json()) as { records: Record_[]; board: BoardEntry[] };
+    const data = (await res.json()) as {
+      records: Record_[];
+      board: BoardEntry[];
+      unmatched: Unmatched[];
+    };
     setRecords(data.records);
     setBoard(data.board ?? []);
+    setUnmatched(data.unmatched ?? []);
   }, [getAccessToken]);
 
   useEffect(() => {
@@ -83,6 +101,37 @@ export default function AdminReview() {
     } else {
       setError(data.error ?? "Could not start the test checkout.");
     }
+  }
+
+  async function attachPayment(payment: Unmatched, preset?: string) {
+    const no =
+      preset ??
+      window.prompt(
+        `Which position did ${payment.brand || payment.email || "this buyer"} pay for? Enter its number.`,
+      );
+    if (!no?.trim()) return;
+    setBusy(payment.session);
+    const token = await getAccessToken();
+    const res = await fetch("/api/admin/position", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        position: no.trim(),
+        action: "sell",
+        email: payment.email,
+        session: payment.session,
+      }),
+    });
+    setBusy("");
+    if (!res.ok) {
+      const data = (await res.json()) as { error?: string };
+      setError(data.error ?? "Could not attach that payment.");
+      return;
+    }
+    await load();
   }
 
   async function nameOnBoard(entry: BoardEntry) {
@@ -213,6 +262,71 @@ export default function AdminReview() {
   return (
     <>
       {error ? <p className="msg err">{error}</p> : null}
+
+      {unmatched.length ? (
+        <div className="card panel" style={{ borderColor: "var(--accent-line)" }}>
+          <div className="head">
+            <h3>Paid, but not on the board</h3>
+            <span className="status rejected">{unmatched.length}</span>
+          </div>
+          <p className="msg ok">
+            These cleared in Stripe without saying which position they were
+            for, so nothing was marked sold. That happens when the payment did
+            not come from a Claim button on the site. Attach each one to a
+            position and it behaves like any other sale.
+          </p>
+          {unmatched.map((payment) => (
+            <div className="board-row" key={payment.session}>
+              <span className="label">
+                {(payment.amount / 100).toLocaleString("en-US", {
+                  style: "currency",
+                  currency: (payment.currency || "usd").toUpperCase(),
+                })}
+              </span>
+              <span className="nm">
+                {payment.brand || payment.email || "unknown buyer"}
+                {payment.contact ? ` · ${payment.contact}` : ""}
+              </span>
+              <span className="label">
+                {new Date(payment.at).toLocaleDateString()}
+              </span>
+              <button
+                className="btn sm quiet"
+                disabled={busy === payment.session}
+                onClick={() => void attachPayment(payment)}
+              >
+                Attach to...
+              </button>
+              {payment.candidates.length ? (
+                <div className="candidates">
+                  <span className="label">
+                    {payment.candidates.length === 1
+                      ? "only this position costs that"
+                      : "positions at that price, still open"}
+                  </span>
+                  {payment.candidates.map((c) => (
+                    <button
+                      key={c.no}
+                      className="btn sm"
+                      disabled={busy === payment.session}
+                      onClick={() => void attachPayment(payment, c.no)}
+                    >
+                      {c.no} · {c.name}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="candidates">
+                  <span className="label">
+                    no open position costs that. Check the amount against a
+                    part payment or a discount.
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {board.length ? (
         <div className="card panel">

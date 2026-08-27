@@ -1,7 +1,12 @@
 import { revalidatePath } from "next/cache";
 import { viewerFrom } from "@/lib/auth";
 import { BY_NO, TAKE_ALL } from "@/lib/positions";
-import { getSale, releasePosition, setSoldManually } from "@/lib/sold";
+import {
+  clearUnmatched,
+  getSale,
+  releasePosition,
+  setSoldManually,
+} from "@/lib/sold";
 import { hideBrand, publishBrand } from "@/lib/sponsors";
 
 /* Take a position off the board or put it back, without Stripe.
@@ -22,6 +27,7 @@ export async function POST(req: Request) {
     email?: string;
     brand?: string;
     url?: string;
+    session?: string;
   };
 
   const no = String(body.position ?? "").trim();
@@ -59,6 +65,10 @@ export async function POST(req: Request) {
   if (!email) return Response.json({ error: "an owner email is required" }, { status: 400 });
 
   await setSoldManually(no, email);
+
+  // attaching a stray Stripe payment to a position clears it from the list
+  if (body.session) await clearUnmatched(String(body.session));
+
   revalidatePath("/");
   return Response.json({ ok: true, position: no, state: "sold", owner: email });
 }
