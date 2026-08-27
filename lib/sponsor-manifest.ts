@@ -21,10 +21,10 @@ type ManifestEntry = { brand: string; url?: string; logo?: string };
 const MANIFEST: Record<string, ManifestEntry> = {
   "01": { brand: "Deepstate", url: "https://deepstate.sh" },
   "02": { brand: "Levanto Labs", url: "https://levanto.ai" },
-  "03": { brand: "Ketone-IQ", url: "https://ketone.com" },
+  "03": { brand: "Ketone-IQ", url: "https://ketone.com", logo: "/sponsors/03-ketone-iq.svg" },
   "04": { brand: "Deepstate", url: "https://deepstate.sh" },
   "05": { brand: "Givner Law", url: "https://givnerlawpc.com" },
-  "06": { brand: "Doorvana", url: "https://doorvana.com" },
+  "06": { brand: "Doorvana", url: "https://doorvana.com", logo: "/sponsors/06-doorvana.svg" },
   "07": { brand: "LO:TECH", url: "https://lo.tech" },
   "08": { brand: "⚡️CMDK", url: "https://cmdk.email" },
   "09": { brand: "Soup", url: "https://trysoup.xyz" },
@@ -32,7 +32,7 @@ const MANIFEST: Record<string, ManifestEntry> = {
   // UNCONFIRMED: no company domain on the sale, handle was Babesnet_xyz
   "11": { brand: "Babes Net", url: "https://x.com/Babesnet_xyz" },
   // UNCONFIRMED: no company domain on the sale, handle was post_polar_
-  "12": { brand: "polarchain", url: "https://x.com/post_polar_" },
+  "12": { brand: "polarchain", url: "https://x.com/post_polar_", logo: "/sponsors/12-polarchain.png" },
   "13": { brand: "Wawandco", url: "https://wawand.co" },
   "14": { brand: "SymbolSecurity", url: "https://symbolsecurity.com" },
   "15": { brand: "Wawandco", url: "https://wawand.co" },
@@ -41,9 +41,10 @@ const MANIFEST: Record<string, ManifestEntry> = {
   "17": { brand: "Joe Hovanec" },
   "18": { brand: "Octant", url: "https://octantlabs.io" },
   "19": { brand: "Relayzero", url: "https://relayzero.com" },
-  "20": { brand: "Last", url: "https://golast.xyz" },
+  // logo supplied white only, recoloured to the board text colour so it reads
+  "20": { brand: "Last", url: "https://golast.xyz", logo: "/sponsors/20-last.svg" },
   // UNCONFIRMED: marked by hand, no payment and no details yet
-  "21": { brand: "nook" },
+  "21": { brand: "nook", logo: "/sponsors/21-nook.png" },
 };
 
 /** The manifest applies to the original board only. */
