@@ -40,10 +40,6 @@ export const CONTACT_EMAIL = "winny@winny.wtf";
 /** The whole-board buy. One buyer, every position. */
 export const TAKE_ALL = { no: "TITLE", price: 3000 } as const;
 
-/** The campaign is finished when someone takes everything, so the
- *  goal is the flat price rather than a second number to maintain. */
-export const GOAL = TAKE_ALL.price;
-
 export const GROUPS: PositionGroup[] = [
   {
     title: "The race kit",

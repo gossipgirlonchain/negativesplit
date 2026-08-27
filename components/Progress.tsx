@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import Reveal from "./Reveal";
-import { GOAL, TOTAL_N } from "@/lib/positions";
+import { INVENTORY, TOTAL_N } from "@/lib/positions";
 import { money, pct } from "@/lib/money";
 
 export default function Progress({
@@ -15,7 +15,8 @@ export default function Progress({
   raised: number;
   open: number;
 }) {
-  const target = pct(raised, GOAL);
+  // no goal: the track shows how much of the board has gone
+  const target = pct(raised, INVENTORY);
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Progress({
             Committed
           </div>
           <div className="fig">
-            <span>{money(raised)}</span> <span className="muted">of {money(GOAL)}</span>
+            <span>{money(raised)}</span>
           </div>
         </div>
         <div className="right">
