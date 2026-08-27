@@ -33,6 +33,7 @@ type BoardEntry = {
   sold: boolean;
   sale: Sale | null;
   onBoard: string;
+  clicks: { total: number; unique: number };
 };
 
 type Record_ = {
@@ -398,6 +399,11 @@ export default function AdminReview() {
                 <span className={`status ${entry.sold ? "rejected" : "approved"}`}>
                   {entry.sold ? "sold" : "available"}
                 </span>
+                {entry.clicks?.total ? (
+                  <span className="label" title="link clicks: total, and distinct visitors">
+                    {entry.clicks.total} clicks · {entry.clicks.unique} people
+                  </span>
+                ) : null}
                 {entry.sold ? (
                   <button
                     className="btn sm quiet"

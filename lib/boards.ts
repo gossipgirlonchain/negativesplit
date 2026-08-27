@@ -63,3 +63,8 @@ export const saleKey = (slug: string, no: string) => `sale:${ns(slug)}${no}`;
 export const sponsorKey = (slug: string, no: string) => `sponsor:${ns(slug)}${no}`;
 export const publicSponsorsKey = (slug: string) => `sponsors:${ns(slug)}public`;
 export const ownerKey = (slug: string, no: string) => `owner:${ns(slug)}${no}`;
+/** kind is "total" or "unique". */
+export const clicksKey = (slug: string, kind: string) =>
+  `clicks:${ns(slug)}${kind}`;
+export const clickSeenKey = (slug: string, no: string, visitor: string) =>
+  `clicks:${ns(slug)}seen:${no}:${visitor}`;

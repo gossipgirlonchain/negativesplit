@@ -9,6 +9,7 @@ import Reveal from "./Reveal";
 import { hoverHandlers, useHover } from "./HoverSync";
 import { GROUPS, buyHref, type Position } from "@/lib/positions";
 import { sponsorLink, type PublicSponsor } from "@/lib/sponsors";
+import { trackClick } from "./trackClick";
 import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
 
@@ -44,6 +45,7 @@ export default function PositionList({
                 isSold={soldSet.has(position.no)}
                 sponsor={sponsors[position.no]}
                 href={buyHref(position.no, board.slug)}
+                board={board.slug}
                 isActive={active === position.target}
                 setActive={setActive}
               />
@@ -60,6 +62,7 @@ function Row({
   isSold,
   sponsor,
   href,
+  board,
   isActive,
   setActive,
 }: {
@@ -67,6 +70,7 @@ function Row({
   isSold: boolean;
   sponsor?: PublicSponsor;
   href: string;
+  board: string;
   isActive: boolean;
   setActive: (target: string | null) => void;
 }) {
@@ -82,6 +86,7 @@ function Row({
         if ((e.target as HTMLElement).closest("a")) return;
         const link = sponsor ? sponsorLink(sponsor) : "";
         if (link) {
+          trackClick(position.no, board);
           window.open(link, "_blank", "noopener,noreferrer");
           return;
         }
@@ -106,6 +111,7 @@ function Row({
             href={sponsorLink(sponsor) || undefined}
             target="_blank"
             rel="noopener noreferrer nofollow"
+            onClick={() => trackClick(position.no, board)}
           >
             {sponsor.logoUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -123,6 +129,7 @@ function Row({
             href={sponsorLink(sponsor)}
             target="_blank"
             rel="noopener noreferrer nofollow"
+            onClick={() => trackClick(position.no, board)}
           >
             Visit
           </a>

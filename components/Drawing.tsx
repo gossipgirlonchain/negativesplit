@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
 import { BY_TARGET, TOTAL_N, buyHref } from "@/lib/positions";
 import { sponsorLink } from "@/lib/sponsors";
+import { trackClick } from "./trackClick";
 import type { PublicSponsor } from "@/lib/sponsors";
 import type { Board } from "@/lib/boards";
 import { money } from "@/lib/money";
@@ -182,6 +183,7 @@ export default function Drawing({
     const go = () => {
       const link = sponsor ? sponsorLink(sponsor) : "";
       if (link) {
+        trackClick(p.no, board.slug);
         window.open(link, "_blank", "noopener,noreferrer");
         return;
       }
