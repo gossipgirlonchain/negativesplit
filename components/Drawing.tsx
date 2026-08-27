@@ -11,6 +11,19 @@ import { BY_TARGET, TOTAL_N, buyHref } from "@/lib/positions";
 import type { PublicSponsor } from "@/lib/sponsors";
 import { money } from "@/lib/money";
 import { hoverHandlers, useHover } from "./HoverSync";
+
+/* The drawing is wider than a phone and sits in a horizontal scroller, so
+   whatever is left-most is all most people ever see. The bike leads.
+   These shift the three clusters without touching any inner coordinate. */
+const SUIT_DX = 728;
+const HELMET_DX = 220;
+const BIKE_DX = -566;
+
+function clusterDx(target: string): number {
+  if (target.startsWith("k-")) return SUIT_DX;
+  if (target.startsWith("b-helmet")) return HELMET_DX;
+  return BIKE_DX;
+}
 import { ZONES, ZONE_ORDER } from "./zones";
 
 export default function Drawing({
@@ -99,9 +112,13 @@ export default function Drawing({
 
     const vb = svg.viewBox.baseVal;
     const bb = g.getBBox();
+    // getBBox reports the box before the element's own transform, and zones
+    // carry their cluster offset as a transform. Add it back or the callout
+    // lands where the zone used to be.
+    const bbx = bb.x + clusterDx(active ?? "");
     const x = Math.max(
       vb.x + 4,
-      Math.min(vb.x + vb.width - width - 4, bb.x + bb.width / 2 - width / 2),
+      Math.min(vb.x + vb.width - width - 4, bbx + bb.width / 2 - width / 2),
     );
     let y = bb.y - (height + 4);
     if (y < vb.y + 4) y = bb.y + bb.height + 12;
@@ -156,7 +173,7 @@ export default function Drawing({
       aria-label={`Technical drawing of a triathlon suit front and back, an aero helmet from the side and front, and a time trial frameset, with ${TOTAL_N} numbered sponsor positions marked in pink`}
     >
       {/* ---------- suit, front ---------- */}
-      <g transform="translate(-11.8,-17.8) scale(0.95)">
+      <g transform="translate(716.2,-17.8) scale(0.95)">
         <path
           className="shape"
           d="M140 44 C124 44 116 47 110 52 L86 64 C66 74 50 100 44 126 L62 152 C70 140 78 134 86 130 L82 196 C78 240 76 268 74 296 L70 380 L78 414 L128 406 L140 368 L152 406 L202 414 L210 380 L206 296 C204 268 202 240 198 196 L194 130 C202 134 210 140 218 152 L236 126 C230 100 214 74 194 64 L170 52 C164 47 156 44 140 44 Z"
@@ -169,7 +186,7 @@ export default function Drawing({
       </g>
 
       {/* ---------- suit, back ---------- */}
-      <g transform="translate(188.2,-17.8) scale(0.95)">
+      <g transform="translate(916.2,-17.8) scale(0.95)">
         <path
           className="shape"
           d="M140 44 C124 44 116 47 110 52 L86 64 C66 74 50 100 44 126 L62 152 C70 140 78 134 86 130 L82 196 C78 240 76 268 74 296 L70 380 L78 414 L128 406 L140 368 L152 406 L202 414 L210 380 L206 296 C204 268 202 240 198 196 L194 130 C202 134 210 140 218 152 L236 126 C230 100 214 74 194 64 L170 52 C164 47 156 44 140 44 Z"
@@ -181,7 +198,7 @@ export default function Drawing({
       </g>
 
       {/* ---------- helmet, side ---------- */}
-      <g transform="translate(448,126.8) scale(0.85)">
+      <g transform="translate(668,126.8) scale(0.85)">
         <path
           className="shape"
           d="M0 40 C2 6 30 -8 62 -8 C104 -8 128 8 138 28 C144 40 134 48 118 52 C86 60 44 62 22 60 C4 58 -1 52 0 40 Z"
@@ -190,7 +207,7 @@ export default function Drawing({
       </g>
 
       {/* ---------- helmet, front ---------- */}
-      <g transform="translate(448,256.8) scale(0.85)">
+      <g transform="translate(668,256.8) scale(0.85)">
         <path
           className="shape"
           d="M45 -8 C74 -8 90 14 90 40 C90 60 74 68 45 68 C16 68 0 60 0 40 C0 14 16 -8 45 -8 Z"
@@ -199,7 +216,7 @@ export default function Drawing({
       </g>
 
       {/* ---------- the bike ---------- */}
-      <g transform="translate(576,-31.5) scale(0.85)">
+      <g transform="translate(10,-31.5) scale(0.85)">
         {/* wheels: shown, not for sale */}
         <g className="wheel">
           <circle className="tyre" cx="180" cy="340" r="140" />
@@ -263,34 +280,34 @@ export default function Drawing({
 
       {/* ---------- dimensions ---------- */}
       <g className="dim">
-        <line x1="729" y1="414" x2="1103" y2="414" />
-        <line x1="729" y1="407" x2="729" y2="421" />
-        <line x1="1103" y1="407" x2="1103" y2="421" />
+        <line x1="163" y1="414" x2="537" y2="414" />
+        <line x1="163" y1="407" x2="163" y2="421" />
+        <line x1="537" y1="407" x2="537" y2="421" />
       </g>
-      <text className="dimtext" x="916" y="407" textAnchor="middle">
+      <text className="dimtext" x="350" y="407" textAnchor="middle">
         985 MM
       </text>
 
       <g className="dim">
-        <line x1="68" y1="258" x2="174.4" y2="258" />
-        <line x1="68" y1="252" x2="68" y2="264" />
-        <line x1="174.4" y1="252" x2="174.4" y2="264" />
+        <line x1="796" y1="258" x2="902.4" y2="258" />
+        <line x1="796" y1="252" x2="796" y2="264" />
+        <line x1="902.4" y1="252" x2="902.4" y2="264" />
       </g>
-      <text className="dimtext" x="121.2" y="251" textAnchor="middle">
+      <text className="dimtext" x="849.2" y="251" textAnchor="middle">
         14 CM
       </text>
 
       {/* ---------- labels ---------- */}
-      <text className="tag" x="121.2" y="400" textAnchor="middle">
+      <text className="tag" x="849.2" y="400" textAnchor="middle">
         FRONT
       </text>
-      <text className="tag" x="321.2" y="400" textAnchor="middle">
+      <text className="tag" x="1049.2" y="400" textAnchor="middle">
         BACK
       </text>
-      <text className="tag" x="507.5" y="200" textAnchor="middle">
+      <text className="tag" x="727.5" y="200" textAnchor="middle">
         HELMET / SIDE
       </text>
-      <text className="tag" x="486.3" y="330" textAnchor="middle">
+      <text className="tag" x="706.3" y="330" textAnchor="middle">
         HELMET / FRONT
       </text>
 
@@ -299,7 +316,11 @@ export default function Drawing({
         const spec = ZONES[target];
         const sponsor = sponsors[BY_TARGET[target].no];
         return (
-          <g key={target} {...zone(target)}>
+          <g
+            key={target}
+            transform={`translate(${clusterDx(target)},0)`}
+            {...zone(target)}
+          >
             {spec.plates.map((plate, i) => (
               <rect key={`p${i}`} className="plate" {...plate} />
             ))}
