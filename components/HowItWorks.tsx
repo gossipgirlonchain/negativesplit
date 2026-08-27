@@ -14,7 +14,7 @@ const STEPS = [
   },
   {
     n: "STEP 03",
-    title: "It races",
+    title: "The races",
     body: "Roughly 1,400 training miles, one 70.3 in the desert on December 6, and every photo either of those produces.",
   },
 ];
