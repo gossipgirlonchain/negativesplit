@@ -24,7 +24,11 @@ export default async function BoardPage({ board }: { board: Board }) {
     getSold(board.slug),
     getApprovedSponsors(board.slug),
   ]);
-  const soldList = [...sold];
+  // a position carrying a sponsor is plainly not for sale, whatever the
+  // sold set says. Fold them together so the board can never show a brand
+  // and a Claim button on the same row.
+  const taken = new Set([...sold, ...Object.keys(sponsors)]);
+  const soldList = [...taken];
 
   return (
     <div data-board={board.slug || "main"}>
@@ -38,7 +42,7 @@ export default async function BoardPage({ board }: { board: Board }) {
           </div>
 
           <div className="wrap" id="positions">
-            <Progress raised={raised(sold)} open={openCount(sold)} />
+            <Progress raised={raised(taken)} open={openCount(taken)} />
             <PositionList sold={soldList} sponsors={sponsors} board={board} />
           </div>
 

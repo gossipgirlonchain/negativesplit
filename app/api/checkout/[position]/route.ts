@@ -3,6 +3,7 @@ import { BY_NO, SITE_NAME, TAKE_ALL, TOTAL_N } from "@/lib/positions";
 import { boardBySlug } from "@/lib/boards";
 import { resolveSiteUrl } from "@/lib/site";
 import { getSold } from "@/lib/sold";
+import { getApprovedSponsors } from "@/lib/sponsors";
 
 /* ============================================================
    CHECKOUT, ON DEMAND
@@ -49,8 +50,11 @@ export async function GET(
   if (!item) return Response.redirect(`${back}/#positions`, 303);
 
   // already gone: send them back to the board rather than take their money
-  const sold = await getSold(board.slug);
-  if (sold.has(item.no) || sold.has(TAKE_ALL.no)) {
+  const [sold, sponsors] = await Promise.all([
+    getSold(board.slug),
+    getApprovedSponsors(board.slug),
+  ]);
+  if (sold.has(item.no) || sold.has(TAKE_ALL.no) || sponsors[item.no]) {
     return Response.redirect(`${back}/?taken=${item.no}#positions`, 303);
   }
 

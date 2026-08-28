@@ -145,6 +145,13 @@ export const GROUPS: PositionGroup[] = [
         price: 250,
       },
       {
+        no: "22",
+        target: "k-thigh-sides",
+        name: "Thigh sides, pair",
+        sub: "A strip down the outer side of each thigh. Reads head on and from behind.",
+        price: 250,
+      },
+      {
         no: "21",
         target: "k-leg-br",
         name: "Back thigh, right",

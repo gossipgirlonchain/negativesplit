@@ -35,6 +35,7 @@ export const ZONE_ORDER = [
   "k-leg-fr",
   "k-leg-bl",
   "k-leg-br",
+  "k-thigh-sides",
   "b-helmet",
   "b-helmet-f",
   "b-dt-low",
@@ -141,6 +142,32 @@ export const ZONES: Record<string, ZoneSpec> = {
     code: "21",
     plates: [{ x: 335, y: 337, width: 38, height: 30, rx: 6 }],
     codes: [{ x: 354, y: 352 }],
+  },
+  // outboard of the thigh plates, rotated so a wordmark runs top to bottom
+  "k-thigh-sides": {
+    code: "22",
+    plates: [
+      {
+        x: -15,
+        y: -4,
+        width: 30,
+        height: 8,
+        rx: 4,
+        transform: "translate(62,353) rotate(90)",
+      },
+      {
+        x: -15,
+        y: -4,
+        width: 30,
+        height: 8,
+        rx: 4,
+        transform: "translate(179,353) rotate(90)",
+      },
+    ],
+    codes: [
+      { x: 62, y: 353 },
+      { x: 179, y: 353 },
+    ],
   },
   "b-helmet": {
     code: "09",

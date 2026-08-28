@@ -81,9 +81,11 @@ const MANIFEST: Record<string, ManifestEntry> = {
     logo: "/sponsors/soup.jpg",
   },
   // gave an X only
+  // supplied white only, recoloured to the board text colour so it reads
   "10": {
     brand: "Good Marketing",
     x: "jamesrichardfry",
+    logo: "/sponsors/good-marketing.svg",
   },
   "11": {
     brand: "Babes Net",
@@ -143,6 +145,12 @@ const MANIFEST: Record<string, ManifestEntry> = {
     url: "https://golast.xyz",
     x: "lastdotnet",
     logo: "/sponsors/last.svg",
+  },
+  // took the thigh sides after a position was sold twice
+  "22": {
+    brand: "Opacity",
+    url: "https://opacitylabs.com",
+    logo: "/sponsors/opacity.jpeg",
   },
   // marked by hand, no payment
   "21": {
